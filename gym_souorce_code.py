@@ -340,24 +340,3 @@ for _ in range(1000):
 env.close()
 
 
-
-# import gym
-
-# # CartPole-v1 환경 생성
-# env = gym.make('CartPole-v1')
-
-# # 초기화
-# observation = env.reset()
-
-# # 에피소드 진행
-# for t in range(500):  # 최대 500 스텝까지 실행
-#     action = env.action_space.sample()  # 무작위 행동 선택
-#     observation, reward, done, info, _ = env.step(action)  # 행동 수행
-#     env.render()  # 환경 렌더링
-
-#     # if done:
-#     #     print(f"Episode finished after {t+1} timesteps")
-#     #     break
-
-# # 환경 종료
-# env.close()
