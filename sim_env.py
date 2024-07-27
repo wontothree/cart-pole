@@ -17,39 +17,23 @@ import time
 # create environment / human is for animation simulation
 env=gym.make('CartPole-v1',render_mode='human')
 
-# reset the environment, 
-# returns an initial state
-# states are cart position, cart velocity, pole angle, pole angular velocity
-(state, _)=env.reset()
+# # reset the environment, 
+# # returns an initial state
+# # states are cart position, cart velocity, pole angle, pole angular velocity
+# (state, _)=env.reset()
 
-# render the environment
-env.render()
-# close the environment
-#env.close()
+# # render the environment
+# env.render()
 
-# push cart in left direction
-env.step(0)
-
-# observation space limits
-env.observation_space
-
-# upper limit
-env.observation_space.high
-
-# lower limit
-env.observation_space.low
-
-# action space
-env.action_space
-
-# all the specs
-env.spec
-
-# maximum number of steps per episode
-env.spec.max_episode_steps
-
-# reward threshold per episode
-env.spec.reward_threshold 
+# environment information
+# env.step(0) # push cart in left direction
+# print(env.observation_space) # observation space limits
+# print(env.observation_space.high) # upper limit
+# print(env.observation_space.low) # lower limit
+# print(env.action_space) # action space
+# print(env.spec) # all the specs
+# print(env.spec.max_episode_steps) # maximum number of steps per episode
+# print(env.spec.reward_threshold) # reward threshold per episode
 
 # simulate the environment
 episodeNumber=50
@@ -68,5 +52,6 @@ for episodeIndex in range(episodeNumber):
         if (terminated):
             time.sleep(1)
             break
-        
+
+# close the environment
 env.close()   
