@@ -1,18 +1,3 @@
-# import gym
-# env = gym.make('CartPole-v1')
-
-# for i_episode in range(20):
-#     observation = env.reset()
-#     for t in range(100):
-#         env.render()
-#         print(observation)
-#         action = env.action_space.sample()
-#         observation, reward, done, info, _ = env.step(action)
-#         if done:
-#             print("Episode finished after {} timesteps".format(t+1))
-#             break
-# env.close()
-
 """
 Classic cart-pole system implemented by Rich Sutton et al.
 Copied from http://incompleteideas.net/sutton/book/code/pole.c
@@ -327,16 +312,100 @@ class CartPoleEnv(gym.Env[np.ndarray, Union[int, np.ndarray]]):
             self.isopen = False
 
 
-env = CartPoleEnv(render_mode="human")  # render_mode를 "human"으로 설정하여 화면에 시각적으로 출력
-observation, info = env.reset()
+
+# env = CartPoleEnv(render_mode="human")  # render_mode를 "human"으로 설정하여 화면에 시각적으로 출력
+# observation, info = env.reset()
+
+# for _ in range(1000):
+#     action = env.action_space.sample()
+#     observation, reward, done, info, _ = env.step(action)
+#     print(f"Observation: {observation}, Reward: {reward}, Terminated: {done}")
+
+#     env.render()
+#     if done:
+#         break
+
+# env.close()
+
+
+
+
+# from tensorflow.keras.models import load_model
+# import numpy as np
+# import gym
+
+# # 환경 생성
+# env = gym.make('CartPole-v1', render_mode="human")
+
+# # Keras 모델 불러오기
+# model = load_model('./cartpole_by_DQN.h5')
+
+# def get_action(observation):
+#     observation = np.expand_dims(observation, axis=0)
+#     q_values = model.predict(observation)
+#     return np.argmax(q_values[0])
+
+# # 환경 초기화
+# observation = env.reset()
+
+# for _ in range(1000):
+#     # 모델을 사용하여 액션 선택
+#     action = get_action(observation)
+    
+#     # 환경에서 한 단계 진행
+#     observation, reward, done, info = env.step(action)
+    
+#     print(f"Observation: {observation}, Reward: {reward}, Terminated: {done}")
+
+#     # 환경 렌더링
+#     env.render()
+
+#     if done:
+#         break
+
+# # 환경 종료
+# env.close()
+
+
+import numpy as np
+import gym
+from tensorflow.keras.models import load_model
+
+# 환경 생성
+env = gym.make('CartPole-v1', render_mode="human")
+
+# 정확한 모델 경로를 지정합니다
+model_path = './cartpole_by_DQN.h5'
+
+try:
+    model = load_model(model_path)
+    print("모델이 성공적으로 로드되었습니다.")
+except Exception as e:
+    print(f"모델 로드 중 오류 발생: {e}")
+
+def get_action(observation):
+    # 모델의 예측을 사용하여 액션 선택
+    observation = np.expand_dims(observation, axis=0)  # 배치 차원 추가
+    q_values = model.predict(observation)
+    return np.argmax(q_values[0])  # 가장 높은 Q값을 가진 액션 선택
+
+# 환경 초기화
+observation, _ = env.reset()
 
 for _ in range(1000):
-    action = env.action_space.sample()
-    observation, reward, done, info, _ = env.step(action)
+    # 모델을 사용하여 액션 선택
+    action = get_action(observation)
+    
+    # 환경에서 한 단계 진행
+    observation, reward, done, info = env.step(action)
+    
+    print(f"Observation: {observation}, Reward: {reward}, Terminated: {done}")
+
+    # 환경 렌더링
     env.render()
-    # if done:
-    #     break
 
+    if done:
+        break
+
+# 환경 종료
 env.close()
-
-
