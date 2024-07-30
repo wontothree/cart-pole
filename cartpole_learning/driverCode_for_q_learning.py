@@ -35,7 +35,7 @@ import time
 import matplotlib.pyplot as plt 
 
 # import the class that implements the Q-Learning algorithm
-from cartpole_learning.functions_for_q_learning import Q_Learning
+from functions_for_q_learning import Q_Learning
 
 #env=gym.make('CartPole-v1',render_mode='human')
 env=gym.make('CartPole-v1')
@@ -65,12 +65,16 @@ numberOfBins=[numberOfBinsPosition,numberOfBinsVelocity,numberOfBinsAngle,number
 alpha=0.1
 gamma=1
 epsilon=0.2
-numberEpisodes=15000
+numberEpisodes=100000
 
 # create an object
 Q1=Q_Learning(env,alpha,gamma,epsilon,numberEpisodes,numberOfBins,lowerBounds,upperBounds)
 # run the Q-Learning algorithm
 Q1.simulateEpisodes()
+
+# Q-table storage
+np.save('q_table.npy', Q1.Qmatrix)
+
 # simulate the learned strategy
 (obtainedRewardsOptimal,env1)=Q1.simulateLearnedStrategy()
 
