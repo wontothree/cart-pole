@@ -227,7 +227,8 @@ class Q_Learning:
         env1=gym.make('CartPole-v1',render_mode='human')
         (currentState,_)=env1.reset()
         env1.render()
-        timeSteps=1000
+        # timeSteps=1000
+        timeSteps=10000
         # obtained rewards at every time step
         obtainedRewards=[]
         

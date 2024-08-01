@@ -1,7 +1,5 @@
 import gym
 import numpy as np
-import time
-import matplotlib.pyplot as plt
 
 from functions_for_q_learning import Q_Learning
 
@@ -31,7 +29,7 @@ numberOfBins = [numberOfBinsPosition, numberOfBinsVelocity, numberOfBinsAngle, n
 alpha = 0.1
 gamma = 1
 epsilon = 0.2
-numberEpisodes = 10000
+numberEpisodes = 100000
 
 
 ########################################################################################################################################
