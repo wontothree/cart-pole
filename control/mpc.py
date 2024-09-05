@@ -254,3 +254,4 @@ def update_figure(i):
 
 ani = FuncAnimation(fig, update_figure, frames = frames)
 ani.save("cart_pole.gif", writer = "pillow", fps = fps)
+
