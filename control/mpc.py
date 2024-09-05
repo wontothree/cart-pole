@@ -1,11 +1,11 @@
 import numpy as np
+
 import casadi
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.animation import FuncAnimation
 
-# constant
 # linear inverted pendulum parameter
 g = 9.81                # gravitational acceleration (m/s^2)
 M = 1                   # cart mass (kg)
@@ -254,3 +254,4 @@ def update_figure(i):
 
 ani = FuncAnimation(fig, update_figure, frames = frames)
 ani.save("cart_pole.gif", writer = "pillow", fps = fps)
+
