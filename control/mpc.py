@@ -1,7 +1,4 @@
-import os
 import numpy as np
-
-from IPython.display import clear_output
 import casadi
 
 import matplotlib.pyplot as plt
@@ -10,12 +7,12 @@ from matplotlib.animation import FuncAnimation
 
 # constant
 # linear inverted pendulum parameter
-g = 9.81        # gravitational acceleration (m/s^2)
-M = 1           # cart mass (kg)
-m = 0.2         # pole mass (kg)
-l = 1           # pole length (m)
-nu = 1          # cantrol variable dimensions
-nx = 4          # state variable dimensions
+g = 9.81                # gravitational acceleration (m/s^2)
+M = 1                   # cart mass (kg)
+m = 0.2                 # pole mass (kg)
+l = 1                   # pole length (m)
+nu = 1                  # cantrol variable dimensions
+nx = 4                  # state variable dimensions
 
 # cost function weights
 Q = casadi.diag([2.5, 10, 0.01, 0.01])
@@ -257,4 +254,3 @@ def update_figure(i):
 
 ani = FuncAnimation(fig, update_figure, frames = frames)
 ani.save("cart_pole.gif", writer = "pillow", fps = fps)
-
