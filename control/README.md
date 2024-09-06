@@ -1,4 +1,4 @@
-# Nonlinear Model Predictive Control vs Reinforcement Learning
+# Nonlinear Model Predictive Control vs Deep Reinforcement Learning
 
 # Functions
 
