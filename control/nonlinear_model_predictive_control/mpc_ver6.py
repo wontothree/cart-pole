@@ -1,3 +1,6 @@
+# ver5를 수정함
+# contraint
+# animation 범위
 import numpy as np
 import casadi
 import matplotlib.pyplot as plt
@@ -8,9 +11,9 @@ class CartPoleNMPC:
     def __init__(self):
         # Linear inverted pendulum parameter
         self.g = 9.81                # Gravitational acceleration (m/s^2)
-        self.M = 1                   # Cart mass (kg)
-        self.m = 0.2                 # Pole mass (kg)
-        self.l = 1                   # Pole length (m)
+        self.M = 0.123                   # Cart mass (kg)
+        self.m = 0.089                 # Pole mass (kg)
+        self.l = 0.4                   # Pole length (m)
         self.nu = 1                  # Control variable dimensions
         self.nx = 4                  # State variable dimensions
 
@@ -25,10 +28,10 @@ class CartPoleNMPC:
         self.dt = self.T / self.K
 
         # Constraints
-        self.x_lb = [-np.inf, -np.inf, -np.inf, -np.inf]
-        self.x_ub = [np.inf, np.inf, np.inf, np.inf]
-        self.u_lb = [-15]
-        self.u_ub = [15]
+        self.x_lb = [-0.36, -np.inf, -np.inf, -np.inf]
+        self.x_ub = [0.36, np.inf, np.inf, np.inf]
+        self.u_lb = [-1]
+        self.u_ub = [1]
 
         # Target value
         self.x_ref = casadi.DM([0, 0, 0, 0])
@@ -51,8 +54,8 @@ class CartPoleNMPC:
         cos = casadi.cos(theta)
         det = self.M + self.m * sin**2
 
-        x_ddot = (self.m * self.l * sin * theta_dot**2 - self.m * self.g * sin * cos + F) / det
-        theta_ddot = (- self.m * self.l * sin * cos * theta_dot**2 + (self.M + self.m) * self.g * sin - F * cos) / (self.l * det)
+        x_ddot = (-self.m * self.l * sin * theta_dot**2 + self.m * self.g * sin * cos + F) / det
+        theta_ddot = (- self.m * self.l * sin * cos * theta_dot**2 + (self.M + self.m) * self.g * sin + F * cos) / (self.l * det)
 
         states_dot = casadi.vertcat(x_dot, theta_dot, x_ddot, theta_ddot)
 
@@ -146,7 +149,7 @@ class CartPoleNMPC:
         u_opt = x0[offset: offset + self.nu]
         return u_opt, x0
 
-    def run_mpc(self, x_init, t_span=[0, 10]):
+    def run_mpc(self, x_init, t_span=[0, 15]):
         # MPC loop
         S = self.make_nlp()
         t_eval = np.arange(*t_span, self.dt)
@@ -199,11 +202,11 @@ class CartPoleNMPC:
         fps = 1 / self.dt
 
         def update_figure(i):
-            x_lim_min = -4
-            x_lim_max = 4
-            y_lim_min = -2
-            y_lim_max = 2
-            u_scale = 15
+            x_lim_min = -0.5
+            x_lim_max = 0.5
+            y_lim_min = -1
+            y_lim_max = 1
+            u_scale = 100
 
             ax.cla()
             ax.set_xlim(x_lim_min, x_lim_max)
@@ -232,14 +235,14 @@ class CartPoleNMPC:
         ani = FuncAnimation(fig, update_figure, frames=frames)
         ani.save(filename, writer="pillow", fps=fps)
 
+if __name__ == "__main__":
+    # Usage
+    cart_pole_nmpc = CartPoleNMPC()
+    x_init = casadi.DM([0, np.pi, 0, 0])  # Initial value
+    X, U, t_eval = cart_pole_nmpc.run_mpc(x_init)
 
-# Usage
-cart_pole_nmpc = CartPoleNMPC()
-x_init = casadi.DM([0, np.pi, 0, 0])  # Initial value
-X, U, t_eval = cart_pole_nmpc.run_mpc(x_init)
+    # Visualize the results
+    cart_pole_nmpc.visualize(X, U, t_eval)
 
-# Visualize the results
-cart_pole_nmpc.visualize(X, U, t_eval)
-
-# Create animation
-cart_pole_nmpc.animate(X, U, t_eval)
+    # Create animation
+    cart_pole_nmpc.animate(X, U, t_eval)
