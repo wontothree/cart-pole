@@ -18,8 +18,8 @@ class CartPoleNMPC:
         self.nx = 4                  # State variable dimensions
 
         # Cost function weights
-        self.Q = casadi.diag([2.5, 10, 0.01, 0.01])
-        self.Q_f = casadi.diag([2.5, 10, 0.01, 0.01])
+        self.Q = casadi.diag([1.5, 10, 0.0001, 0.0001])
+        self.Q_f = casadi.diag([1.5, 10, 0.0001, 0.0001])
         self.R = casadi.diag([0.1])
 
         # Prediction horizon
@@ -202,8 +202,8 @@ class CartPoleNMPC:
         fps = 1 / self.dt
 
         def update_figure(i):
-            x_lim_min = -0.5
-            x_lim_max = 0.5
+            x_lim_min = -5
+            x_lim_max = 5
             y_lim_min = -1
             y_lim_max = 1
             u_scale = 100
@@ -238,7 +238,7 @@ class CartPoleNMPC:
 if __name__ == "__main__":
     # Usage
     cart_pole_nmpc = CartPoleNMPC()
-    x_init = casadi.DM([0, np.pi, 0, 0])  # Initial value
+    x_init = casadi.DM([0, np.pi, 1, 0])  # Initial value
     X, U, t_eval = cart_pole_nmpc.run_mpc(x_init)
 
     # Visualize the results
