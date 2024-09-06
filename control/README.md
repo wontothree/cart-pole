@@ -44,7 +44,7 @@
 ||||
 ||||
 
-# Dependencies
+# NMPC Dependencies
 
 ```bash
 pyenv install 3.10.6
@@ -59,3 +59,25 @@ pip install casadi
 https://github.com/acados/acados/tree/master
 
 https://github.com/casadi/casadi/blob/main/docs/examples/python/rocket.py
+
+# DRL Dependencies
+
+```bash
+pip install torch
+```
+
+```bash
+pip install gymnasium
+```
+
+```bash
+pip install prototwin
+```
+
+```bash
+pip install stable_baselines3
+```
+
+```bash
+prototwin_gymnasium
+```
