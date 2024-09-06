@@ -170,8 +170,10 @@ class CartPoleNMPC:
 
         return X, U, t_eval
 
-if __name__ == "__main__":
-    # Usage
-    cart_pole_nmpc = CartPoleNMPC()
-    x_init = casadi.DM([0, np.pi, 1, 0])  # Initial value
-    X, U, t_eval = cart_pole_nmpc.run_mpc(x_init)
+
+
+# if __name__ == "__main__":
+#     # Usage
+#     cart_pole_nmpc = CartPoleNMPC()
+#     x_init = casadi.DM([0, np.pi, 1, 0])  # Initial value
+#     X, U, t_eval = cart_pole_nmpc.run_mpc(x_init)

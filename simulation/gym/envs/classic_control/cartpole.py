@@ -236,11 +236,15 @@ class CartPoleEnv(gym.Env[np.ndarray, Union[int, np.ndarray]]):
             self.clock = pygame.time.Clock()
 
         world_width = self.x_threshold * 2
-        scale = self.screen_width / world_width
+
+        # pole
+        scale = self.screen_width / world_width / 6
         polewidth = 10.0
         polelen = scale * (2 * self.length)
-        cartwidth = 50.0
-        cartheight = 30.0
+
+        # cart
+        cartwidth = 20 * world_width # 50.0
+        cartheight = 10 * world_width # 30.0
 
         if self.state is None:
             return None
