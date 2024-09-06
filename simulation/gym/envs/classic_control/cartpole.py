@@ -113,8 +113,18 @@ class CartPoleEnv(gym.Env[np.ndarray, Union[int, np.ndarray]]):
         )
 
         # self.action_space = spaces.Discrete(2)
+        # self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(1,), dtype=np.float32)
+        # self.observation_space = spaces.Box(-high, high, dtype=np.float32)
+
         self.action_space = spaces.Box(low=-1.0, high=1.0, shape=(1,), dtype=np.float32)
-        self.observation_space = spaces.Box(-high, high, dtype=np.float32)
+
+        # Define high and low limits for the observation space
+        high = np.array([self.x_threshold * 2, self.theta_threshold_radians * 2, np.finfo(np.float32).max, np.finfo(np.float32).max])
+        low = np.array([-self.x_threshold * 2, -self.theta_threshold_radians * 2, -np.finfo(np.float32).max, -np.finfo(np.float32).max])
+
+        self.observation_space = spaces.Box(low=low, high=high, dtype=np.float32)
+
+
 
         self.render_mode = render_mode
 
