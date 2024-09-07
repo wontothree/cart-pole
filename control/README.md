@@ -1,5 +1,10 @@
 # Nonlinear Model Predictive Control vs Deep Reinforcement Learning
 
+[Nonlinear Model Predictive Control](https://wontothree.github.io/cartpole/mpc/)
+
+- Input : initial state, current state
+- Output : next control input
+
 # Functions
 
 |Function Name|Input|Return|Description|

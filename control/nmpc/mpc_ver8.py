@@ -6,8 +6,8 @@ class CartPoleNMPC:
     def __init__(self):
         # constant parameter
         self.gravity = 9.81                         # Gravitational acceleration (m/s^2)
-        self.cart_mass = 0.123                      # Cart mass (kg)
-        self.pole_mass = 0.089                      # Pole mass (kg)
+        self.cart_mass = 0.123                      # Cart mass (prediction_horizong)
+        self.pole_mass = 0.089                      # Pole mass (prediction_horizong)
         self.pole_length = 0.4                      # Pole length (m)
 
         # dimension of state and control
@@ -22,10 +22,10 @@ class CartPoleNMPC:
         self.Q_f = casadi.diag([1.5, 10, 0.0001, 0.0001])
         self.R = casadi.diag([0.1])
 
-        # prediction horizon and control sampling time
-        self.T = 1
-        self.K = 20
-        self.dt = self.T / self.K
+        # prediction prediction_horizon and control sampling time
+        self.prediction_horizon = 50                                                                   # prediction_Horizon
+        self.ctrl_sampling_time = 0.1                                                                  # Control Sampling Time
+        self.total_prediction_time = self.prediction_horizon * self.ctrl_sampling_time                 # Prediction Time
 
         # constraints
         self.state_lower_bound = [-0.36, -np.inf, -np.inf, -np.inf]
@@ -37,7 +37,7 @@ class CartPoleNMPC:
         self.x_ref = casadi.DM([0, 0, 0, 0])
         self.u_ref = casadi.DM([0])
 
-        self.total = (self.K + 1) * self.state_dim + self.K * self.ctrl_dim
+        self.total_variables = (self.prediction_horizon + 1) * self.state_dim + self.prediction_horizon * self.ctrl_dim
 
     def calc_continuous_dynamics(self):
         # constant parameter
@@ -74,15 +74,15 @@ class CartPoleNMPC:
         f = self.calc_continuous_dynamics()
 
         r1 = f(x=self.state, u=self.ctrl)["x_dot"]
-        r2 = f(x=self.state + self.dt * r1 / 2, u=self.ctrl)["x_dot"]
-        r3 = f(x=self.state + self.dt * r2 / 2, u=self.ctrl)["x_dot"]
-        r4 = f(x=self.state + self.dt * r3, u=self.ctrl)["x_dot"]
+        r2 = f(x=self.state + self.ctrl_sampling_time * r1 / 2, u=self.ctrl)["x_dot"]
+        r3 = f(x=self.state + self.ctrl_sampling_time * r2 / 2, u=self.ctrl)["x_dot"]
+        r4 = f(x=self.state + self.ctrl_sampling_time * r3, u=self.ctrl)["x_dot"]
 
-        states_next = self.state + self.dt * (r1 + 2 * r2 + 2 * r3 + r4) / 6
+        states_next = self.state + self.ctrl_sampling_time * (r1 + 2 * r2 + 2 * r3 + r4) / 6
 
-        F_RK4 = casadi.Function("F_RK4", [self.state, self.ctrl], [states_next], ["x", "u"], ["x_next"])
+        F_Rprediction_horizon4 = casadi.Function("F_Rprediction_horizon4", [self.state, self.ctrl], [states_next], ["x", "u"], ["x_next"])
 
-        return F_RK4
+        return F_Rprediction_horizon4
 
     # state cost
     def calc_state_cost(self, x, u):
@@ -103,17 +103,17 @@ class CartPoleNMPC:
     # solver
     def solve_nip(self):
         # Nonlinear programming problem setup
-        F_RK4 = self.calc_discrete_dynamics()
+        F_Rprediction_horizon4 = self.calc_discrete_dynamics()
 
-        U = [casadi.SX.sym(f"u_{k}", self.nu) for k in range(self.K)]
-        X = [casadi.SX.sym(f"x_{k}", self.nx) for k in range(self.K + 1)]
+        U = [casadi.SX.sym(f"u_{prediction_horizon}", self.nu) for prediction_horizon in range(self.prediction_horizon)]
+        X = [casadi.SX.sym(f"x_{prediction_horizon}", self.nx) for prediction_horizon in range(self.prediction_horizon + 1)]
         G = []
 
         J = 0
 
-        for k in range(self.K):
-            J += self.calc_state_cost(X[k], U[k]) * self.dt
-            eq = X[k + 1] - F_RK4(x=X[k], u=U[k])["x_next"]
+        for prediction_horizon in range(self.prediction_horizon):
+            J += self.calc_state_cost(X[prediction_horizon], U[prediction_horizon]) * self.ctrl_sampling_time
+            eq = X[prediction_horizon + 1] - F_Rprediction_horizon4(x=X[prediction_horizon], u=U[prediction_horizon])["x_next"]
             G.append(eq)
 
         J += self.calc_terminal_cost(X[-1])
@@ -129,24 +129,25 @@ class CartPoleNMPC:
         # Control input calculation
         x_init = x_init.full().ravel().tolist()
 
-        lbx = x_init + self.K * self.states_lower_bound + self.K * self.u_lb
-        ubx = x_init + self.K * self.x_ub + self.K * self.u_ub
-        lbg = [0] * self.K * self.nx
-        ubg = [0] * self.K * self.nx
+        # constraints
+        lbx = x_init + self.prediction_horizon * self.state_lower_bound + self.prediction_horizon * self.ctrl_lower_bound
+        ubx = x_init + self.prediction_horizon * self.state_lower_bound + self.prediction_horizon * self.ctrl_upper_bound
+        lbg = [0] * self.prediction_horizon * self.state_dim
+        ubg = [0] * self.prediction_horizon * self.state_dim
 
         res = S(lbx=lbx, ubx=ubx, lbg=lbg, ubg=ubg, x0=x0)
 
-        offset = (self.K + 1) * self.nx
+        offset = (self.prediction_horizon + 1) * self.state_dim
         x0 = res["x"]
-        u_opt = x0[offset: offset + self.nu]
+        u_opt = x0[offset: offset + self.ctrl_dim]
         return u_opt, x0
 
     def run_mpc(self, x_init, t_span=[0, 15]):
         # MPC loop
         S = self.solve_nip()
-        t_eval = np.arange(*t_span, self.dt)
+        t_eval = np.arange(*t_span, self.ctrl_sampling_time)
 
-        x0 = casadi.DM.zeros(self.total)
+        x0 = casadi.DM.zeros(self.total_variables)
         I = self.update_next_state()
 
         X = [x_init]
@@ -171,13 +172,15 @@ class CartPoleNMPC:
 
         dae = {"x": self.state, "p": self.ctrl, "ode": ode}
 
-        I = casadi.integrator("I", "cvodes", dae, 0, self.dt)
+        I = casadi.integrator("I", "cvodes", dae, 0, self.ctrl_sampling_time)
 
         return I
 
-
 if __name__ == "__main__":
-    # Usage
     cart_pole_nmpc = CartPoleNMPC()
-    x_init = casadi.DM([0, np.pi, 1, 0])  # Initial value
-    X, U, t_eval = cart_pole_nmpc.run_mpc(x_init)
+
+    # initial state
+    initial_state = casadi.DM([0, np.pi, 0, 0])
+
+    #
+    X, U, t_eval = cart_pole_nmpc.run_mpc(initial_state)
