@@ -7,6 +7,18 @@
 
 # Functions
 
+|Function|Description|
+|---|---|
+|set_reference_state||
+|set_reference_control||
+|set_initial_state||
+|set_current_state||
+|define_dynamic_model||
+|define_constraints||
+|define_cost_function||
+|solve||
+|||
+
 |Function Name|Input|Return|Description|
 |---|---|---|---|
 |calc_continuous_dynamics|||nonlinear state space model의 함수를 반환한다. $\dot{x} = f(x, u)$에서 f를 반환한다. 이 함수는 continuous state space model을 반환한다.|
@@ -33,8 +45,27 @@
 
 # NMPC Dependencies
 
-[CasADi](https://web.casadi.org/)
-
 ```bash
 pip install casadi
 ```
+
+# [CasADi](https://web.casadi.org/)
+
+```py
+option = {'print_time': False, 'ipopt': {'max_iter': 10, 'print_level': 0}}
+nlp = {"x": casadi.vertcat(*X, *U), "f": J, "g": casadi.vertcat(*G)}
+S = casadi.nlpsol("S", "ipopt", nlp, option)
+```
+
+option
+
+- 'print_time': False : 최적화 과정에서의 소요 시간 정보를 출력하지 않는다.
+- ipopt : nonlinear optimization solver
+    - max_iter : 최적화 과정에서의 최대 반복 횟수
+    - print_level : IPOPT의 출력 세부 수준
+
+nlp
+
+- "x" : casadi.vertcat(*X, *U) : 상태변수 X와 제어변수 U를 세로로 연결하여 최적화 변수 벡터를 생성한다.
+- "f" : 목적함수
+- "g" : casadi.vertcat(*G) : 제약조건을 세로로 연결하여 하나의 벡터로 만든다.

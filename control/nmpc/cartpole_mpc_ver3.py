@@ -89,7 +89,7 @@ class MPCController:
     def compute_state_cost(self, x, u):
         x_diff = x - self.x_ref
         u_diff = u - self.u_ref
-        cost = (casadi.dot(self.Q @ x_diff, x_diff)) + casadi.dot(self.R @ u_diff, u_diff) / 2
+        cost = (casadi.dot(Q@x_diff, x_diff) + casadi.dot(R@u_diff, u_diff)) / 2
         return cost
 
     def compute_terminal_cost(self, x):
