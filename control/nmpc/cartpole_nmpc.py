@@ -71,8 +71,22 @@ class CartPoleNMPC(MPC):
 
         return discretied_dynamic_model
     
-    def define_constraints(self):
-        pass
+    def define_constraint(self, state_trajectory, control_trajectory, initial_state):
+        # equality constraint
+        equality_constraint_lower_bound = [0] * (self.prediction_horizon * self.state_dim)
+        equality_constraint_upper_bound = [0] * (self.prediction_horizon * self.state_dim)
+        equality_constraint = []
+        for step in range(self.prediction_horizon):
+            predicted_next_state = self.define_dynamic_model(x = state_trajectory[step], u = control_trajectory[step])["x_next"]
+            constraint = state_trajectory[step  + 1] - predicted_next_state
+            equality_constraint.append(constraint)
+        
+        # inequality constraint
+        initial_state = initial_state.full().ravel().tolist()
+        optimization_variable_lower_bound = initial_state + self.prediction_horizon * self.state_lower_bound + self.prediction_horizon * self.control_lower_bound
+        optimization_variable_upper_bound = initial_state + self.prediction_horizon * self.state_upper_bound + self.prediction_horizon * self.control_upper_bound
+
+        return equality_constraint, equality_constraint_lower_bound, equality_constraint_upper_bound, optimization_variable_lower_bound, optimization_variable_upper_bound
 
     # cost for one state and control input
     def define_cost_function(self, state_trajectory, control_trajectory):
@@ -100,7 +114,57 @@ class CartPoleNMPC(MPC):
 
 
     def solve(self):
-        pass
+        discrete_dynamic_model = self.define_dynamic_model()
+
+        state_trajectory = [casadi.SX.sym(f"x_{k}", self.state_dim) for k in range(self.prediction_horizon + 1)]
+        control_trajectory = [casadi.SX.sym(f"u_{k}", self.control_dim) for k in range(self.prediction_horizon)]
+
+        # cost function
+        cost_function = self.define_cost_function(state_trajectory, control_trajectory)
+
+        # equality constraint and inequality constraint
+        equality_constraint, equality_constraint_lower_bound, equality_constraint_upper_bound, optimization_variable_lower_bound, optimization_variable_upper_bound = \
+            self.define_constraint(state_trajectory, control_trajectory, self.initial_state)
+        
+        # set up the NLP problem
+        nonlinear_programming_problem = {
+            "x": casadi.vertcat(*state_trajectory, *control_trajectory),
+            "f": cost_function,
+            "g": casadi.vertcat(*equality_constraint)
+        }
+
+        # solver options
+        options = {
+            "print_time": False,
+            "ipopt": {
+                "max_iter": 100,
+                "print_level": 0
+            }
+        }
+
+        # create the solver
+        solver = casadi.nlpsol("solver", "ipopt", nonlinear_programming_problem, options)
+
+
+        initial_guess = casadi.DM.zeros(self.total_variables)
+
+        # solve the optimization problem
+        optimization_problem_solving_result = solver(
+            x0 = initial_guess,
+            lbx = optimization_variable_lower_bound,
+            ubx = optimization_variable_upper_bound,
+            lbg = equality_constraint_lower_bound,
+            ubg = equality_constraint_upper_bound
+        )
+
+        # extract the optimal state and control trajectory
+        optimization_problem_solution = optimization_problem_solving_result["x"]
+        optimal_state_tragjectory = optimization_problem_solution[:(self.prediction_horizon + 1) * self.state_dim]
+        optimal_control_trajectory = optimization_problem_solution[(self.prediction_horizon + 1) * self.control_dim]
+
+        return optimal_state_tragjectory, optimal_control_trajectory
+
+
 
 if __name__ == "__main__":
     cart_pole_nmpc = CartPoleNMPC()

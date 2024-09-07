@@ -45,27 +45,8 @@
 
 # NMPC Dependencies
 
+[CasADi](https://web.casadi.org/)
+
 ```bash
 pip install casadi
 ```
-
-# [CasADi](https://web.casadi.org/)
-
-```py
-option = {'print_time': False, 'ipopt': {'max_iter': 10, 'print_level': 0}}
-nlp = {"x": casadi.vertcat(*X, *U), "f": J, "g": casadi.vertcat(*G)}
-S = casadi.nlpsol("S", "ipopt", nlp, option)
-```
-
-option
-
-- 'print_time': False : 최적화 과정에서의 소요 시간 정보를 출력하지 않는다.
-- ipopt : nonlinear optimization solver
-    - max_iter : 최적화 과정에서의 최대 반복 횟수
-    - print_level : IPOPT의 출력 세부 수준
-
-nlp
-
-- "x" : casadi.vertcat(*X, *U) : 상태변수 X와 제어변수 U를 세로로 연결하여 최적화 변수 벡터를 생성한다.
-- "f" : 목적함수
-- "g" : casadi.vertcat(*G) : 제약조건을 세로로 연결하여 하나의 벡터로 만든다.
