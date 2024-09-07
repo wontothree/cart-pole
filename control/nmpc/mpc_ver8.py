@@ -2,19 +2,17 @@
 import numpy as np
 import casadi
 
-
 class CartPoleNMPC:
     def __init__(self):
         # constant parameter
-        # Gravitational acceleration (m/s^2)
-        self.g = 9.81
-        self.M = 0.123                      # Cart mass (kg)
-        self.m = 0.089                      # Pole mass (kg)
-        self.l = 0.4                        # Pole length (m)
+        self.gravity = 9.81                         # Gravitational acceleration (m/s^2)
+        self.cart_mass = 0.123                      # Cart mass (kg)
+        self.pole_mass = 0.089                      # Pole mass (kg)
+        self.pole_length = 0.4                      # Pole length (m)
 
         # dimension of state and control
-        self.state_dim = 4                  # State variable dimensions
-        self.ctrl_dim = 1                   # Control variable dimensions
+        self.state_dim = 4                          # State variable dimensions
+        self.ctrl_dim = 1                           # Control variable dimensions
 
         self.state = casadi.SX.sym("state", self.state_dim)
         self.ctrl = casadi.SX.sym("ctrl", self.ctrl_dim)
@@ -42,24 +40,29 @@ class CartPoleNMPC:
         self.total = (self.K + 1) * self.state_dim + self.K * self.ctrl_dim
 
     def calc_continuous_dynamics(self):
-        g = self.g
-        M = self.M
-        m = self.m
-        l = self.l
+        # constant parameter
+        g = self.gravity
+        M = self.cart_mass
+        m = self.pole_mass
+        L = self.pole_length
 
+        # state variables
         x = self.state[0]
         theta = self.state[1]
         x_dot = self.state[2]
         theta_dot = self.state[3]
+
+        # control input
         F = self.ctrl[0]
 
         sin = casadi.sin(theta)
         cos = casadi.cos(theta)
         det = self.M + self.m * sin**2
 
-        x_ddot = (m * l * sin * theta_dot**2 + m * g * sin * cos + F) / det
-        theta_ddot = (m * l * sin * cos * theta_dot**2 +
-                      (M + m) * g * sin + F * cos) / (l * det)
+        # dynamics
+        x_ddot = (m * L * sin * theta_dot**2 + m * g * sin * cos + F) / det
+        theta_ddot = (m * L * sin * cos * theta_dot**2 +
+                      (M + m) * g * sin + F * cos) / (L * det)
 
         states_dot = casadi.vertcat(x_dot, theta_dot, x_ddot, theta_ddot)
 
@@ -77,22 +80,11 @@ class CartPoleNMPC:
 
         states_next = self.state + self.dt * (r1 + 2 * r2 + 2 * r3 + r4) / 6
 
-        F_RK4 = casadi.Function("F_RK4", [self.state, self.ctrl], [
-                                states_next], ["x", "u"], ["x_next"])
+        F_RK4 = casadi.Function("F_RK4", [self.state, self.ctrl], [states_next], ["x", "u"], ["x_next"])
 
         return F_RK4
 
-    def update_next_state(self):
-
-        f = self.calc_continuous_dynamics()
-        ode = f(x=self.state, u=self.ctrl)["x_dot"]
-
-        dae = {"x": self.state, "p": self.ctrl, "ode": ode}
-
-        I = casadi.integrator("I", "cvodes", dae, 0, self.dt)
-
-        return I
-
+    # state cost
     def calc_state_cost(self, x, u):
         x_diff = x - self.x_ref
         u_diff = u - self.u_ref
@@ -101,12 +93,14 @@ class CartPoleNMPC:
 
         return state_cost
 
+    # terminal cost
     def calc_terminal_cost(self, x):
         x_diff = x - self.x_ref
         terminal_cost = casadi.dot(self.Q_f @ x_diff, x_diff) / 2
 
         return terminal_cost
 
+    # solver
     def solve_nip(self):
         # Nonlinear programming problem setup
         F_RK4 = self.calc_discrete_dynamics()
@@ -169,6 +163,17 @@ class CartPoleNMPC:
         U = np.array(U).reshape(t_eval.size, self.ctrl_dim)
 
         return X, U, t_eval
+    
+    def update_next_state(self):
+
+        f = self.calc_continuous_dynamics()
+        ode = f(x=self.state, u=self.ctrl)["x_dot"]
+
+        dae = {"x": self.state, "p": self.ctrl, "ode": ode}
+
+        I = casadi.integrator("I", "cvodes", dae, 0, self.dt)
+
+        return I
 
 
 if __name__ == "__main__":
@@ -176,9 +181,3 @@ if __name__ == "__main__":
     cart_pole_nmpc = CartPoleNMPC()
     x_init = casadi.DM([0, np.pi, 1, 0])  # Initial value
     X, U, t_eval = cart_pole_nmpc.run_mpc(x_init)
-
-    # Visualize the results
-    cart_pole_nmpc.visualize(X, U, t_eval)
-
-    # Create animation
-    cart_pole_nmpc.animate(X, U, t_eval)
