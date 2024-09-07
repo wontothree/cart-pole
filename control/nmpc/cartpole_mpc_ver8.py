@@ -125,13 +125,13 @@ class CartPoleNMPC:
 
         return S
 
-    def calc_optimal_control(self, S, x_init, x0):
+    def calc_optimal_control(self, S, init_state, x0):
         # Control input calculation
-        x_init = x_init.full().ravel().tolist()
+        init_state = init_state.full().ravel().tolist()
 
         # constraints
-        lbx = x_init + self.prediction_horizon * self.state_lower_bound + self.prediction_horizon * self.ctrl_lower_bound
-        ubx = x_init + self.prediction_horizon * self.state_lower_bound + self.prediction_horizon * self.ctrl_upper_bound
+        lbx = init_state + self.prediction_horizon * self.state_lower_bound + self.prediction_horizon * self.ctrl_lower_bound
+        ubx = init_state + self.prediction_horizon * self.state_lower_bound + self.prediction_horizon * self.ctrl_upper_bound
         lbg = [0] * self.prediction_horizon * self.state_dim
         ubg = [0] * self.prediction_horizon * self.state_dim
 
@@ -142,7 +142,7 @@ class CartPoleNMPC:
         u_opt = x0[offset: offset + self.ctrl_dim]
         return u_opt, x0
 
-    def run_mpc(self, x_init, t_span=[0, 15]):
+    def run_mpc(self, init_state, t_span=[0, 15]):
         # MPC loop
         S = self.solve_nip()
         t_eval = np.arange(*t_span, self.ctrl_sampling_time)
@@ -150,9 +150,9 @@ class CartPoleNMPC:
         x0 = casadi.DM.zeros(self.total_variables)
         I = self.update_next_state()
 
-        X = [x_init]
+        X = [init_state]
         U = []
-        x_current = x_init
+        x_current = init_state
         for t in t_eval:
             u_opt, x0 = self.calc_optimal_control(S, x_current, x0)
             x_current = I(x0=x_current, p=u_opt)["xf"]
@@ -180,7 +180,7 @@ if __name__ == "__main__":
     cart_pole_nmpc = CartPoleNMPC()
 
     # initial state
-    initial_state = casadi.DM([0, np.pi, 0, 0])
+    init_state = casadi.DM([0, np.pi, 0, 0])
 
     #
-    X, U, t_eval = cart_pole_nmpc.run_mpc(initial_state)
+    X, U, t_eval = cart_pole_nmpc.run_mpc(init_state)

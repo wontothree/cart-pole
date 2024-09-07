@@ -15,6 +15,7 @@
 |calc_terminal_cost|||terminal cost를 계산한다.|
 |solve_nlp|||nonlinear programming solver. calc_discrete_dynamics, calc_state_cost, calc_terminal_cost를 이용한다.|
 |calc_optimal_control|||최적의 제어 입력을 계산한다. solve_nip, update_next_state을 이용한다.|
+|run_mpc||||
 |update_next_state|||주어진 상태와 제어 입력을 기반으로 시스템의 동역학을 수치적으로 통합하여 다음 상태를 계산한다. calc_continuous_dynamics를 이용한다. 여기서는 센서를 통해 상태 실측값 대신에 사용된다.|
 
 # Variables
