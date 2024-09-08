@@ -16,12 +16,6 @@ class MPC(ABC):
     def set_reference_control(self, reference_control):
         self.reference_control = reference_control
 
-    def set_initial_state(self, initial_state):
-        self.initial_state = initial_state
-
-    def set_current_state(self, current_state):
-        self.current_state = current_state
-
     @abstractmethod
     def define_dynamic_model(self, state, control):
         pass

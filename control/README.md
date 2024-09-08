@@ -19,7 +19,13 @@
 
 |Function Name|Description|
 |---|---|
-|
+|__init__||
+|define_dynamic_model||
+|define_constraint||
+|define_cost_function||
+|solve||
+|simulate||
+|visualize||
 
 
 # Variables
