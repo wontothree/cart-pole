@@ -6,7 +6,7 @@ from mpc import MPC
 
 class CartPoleNMPC(MPC):
     def __init__(self):
-        super().__init__(state_dim=4, control_dim=1, prediction_horizon=2, control_sampling_time=1)
+        super().__init__(state_dim=4, control_dim=1, prediction_horizon=20, control_sampling_time=0.1)
 
         # System parameters
         self.gravity = 9.81
@@ -162,63 +162,108 @@ class CartPoleNMPC(MPC):
         optimization_problem_solution = optimization_problem_solving_result["x"]
 
         control_start_index = (self.prediction_horizon + 1) * self.state_dim
-        optimal_state_trajectory = optimization_problem_solution[:control_start_index].reshape((self.prediction_horizon + 1, self.state_dim)).T
-        optimal_control_trajectory = optimization_problem_solution[control_start_index:].reshape((self.prediction_horizon, self.control_dim)).T
-
-        print("Optimal state trajectory shape:", optimal_state_trajectory.shape)
-        print("Optimal control trajectory shape:", optimal_control_trajectory.shape)
+        optimal_state_trajectory = optimization_problem_solution[:control_start_index].reshape((self.prediction_horizon + 1, self.state_dim)).toarray()
+        optimal_control_trajectory = optimization_problem_solution[control_start_index:].reshape((self.prediction_horizon, self.control_dim)).toarray()
 
         return optimal_state_trajectory, optimal_control_trajectory
 
-    def run(self, current_state):
-        _, optimal_control_trajectory = self.solve(current_state)
-
-        optimal_next_control = optimal_control_trajectory[0]
-
-        return optimal_next_control
-
     def simulate(self, current_state, time_span):
         time_steps = np.arange(time_span[0], time_span[1], self.control_sampling_time)
+
+        # ...
+        I = self.make_integrator()
         
-        actual_state_trajectory = [current_state]
+        actual_state_trajectory = [current_state.full().ravel()]
         actual_control_trajectory = []
 
         for time_step in time_steps:
             optimal_state_trajectory, optimal_control_trajectory = self.solve(current_state)
 
-            optimal_next_control = optimal_control_trajectory[0]
-
-            actual_state_trajectory.append(optimal_state_trajectory[:self.state_dim].full().ravel())
-            actual_control_trajectory.append(optimal_next_control.full().ravel())
+            current_state = I(x0=current_state, p=optimal_control_trajectory[0])["xf"]
+            print(type(current_state))
+            # 센서로부터 얻은 actual_state_trajectory를 저장해야 한다.
+            # actual_state_trajectory.append(optimal_state_trajectory[0])
+            actual_state_trajectory.append(current_state.full().ravel())
+            actual_control_trajectory.append(optimal_control_trajectory[0])
 
         actual_state_trajectory.pop()
-        actual_state_trajectory = np.array(actual_state_trajectory).reshape(time_steps.size, self.state_dim)
-        actual_control_trajectory = np.array(actual_control_trajectory).reshape(time_steps.size, self.control_dim)
-
-        print(len(time_steps))
-        print(len(actual_state_trajectory))
-        print(len(actual_control_trajectory))
 
         return actual_state_trajectory, actual_control_trajectory, time_steps
     
     def visualize(self, actual_state_trajectory, actual_control_trajectory, time_steps):
-        plt.figure(figsize=(12, 4))
-
+        # Convert state and control trajectories to NumPy arrays
+        actual_state_trajectory = np.array(actual_state_trajectory)
+        actual_control_trajectory = np.array(actual_control_trajectory)
+         
+        # Ensure time_steps is a NumPy array
+        time_steps = np.array(time_steps)
+        
+        # Plot states
+        plt.figure(figsize=(12, 6))
+        
         plt.subplot(1, 2, 1)
-        for k in range(actual_state_trajectory.shape[1]):
-            plt.plot(time_steps[:actual_state_trajectory.shape[0]], actual_state_trajectory[:, k], label=f"x_{k}")
+        for k in range(self.state_dim):
+            plt.plot(time_steps[:len(actual_state_trajectory)], actual_state_trajectory[:, k], label=f"x_{k}")
         plt.legend()
         plt.xlabel("Time")
         plt.ylabel("State")
-
+        plt.title("State Trajectories")
+        
+        # Plot controls
         plt.subplot(1, 2, 2)
-        for k in range(actual_control_trajectory.shape[1]):
-            plt.step(time_steps[:-1], actual_control_trajectory[:, k], linestyle="--", label=f"u_{k}")
+        for k in range(self.control_dim):
+            plt.step(time_steps[:len(actual_control_trajectory)], actual_control_trajectory[:, k], linestyle="--", label=f"u_{k}")
         plt.legend()
         plt.xlabel("Time")
         plt.ylabel("Control")
+        plt.title("Control Trajectories")
 
+        plt.tight_layout()
         plt.show()
+
+    def make_f(self):
+        # constant parameter
+        g = self.gravity
+        M = self.cart_mass
+        m = self.pole_mass
+        L = self.pole_length
+
+        # state variables
+        x = self.state[0]
+        theta = self.state[1]
+        x_dot = self.state[2]
+        theta_dot = self.state[3]
+
+        # control input variable
+        F = self.control[0]
+
+        sin = casadi.sin(theta)
+        cos = casadi.cos(theta)
+        common = M + m * sin**2
+
+        # dynamics
+        x_ddot = (m * g * sin * cos - m * L / 2 * sin * theta_dot**2 + F) / common
+        theta_ddot = (- m * L / 2 * sin * cos * theta_dot**2 + (M + m) * g * sin + F * cos) / (L / 2 * common)
+
+        states_dot = casadi.vertcat(x_dot, theta_dot, x_ddot, theta_ddot)
+
+        continuous_dynamic_model = casadi.Function("f", [self.state, self.control], [states_dot], ['x', 'u'], ['x_dot'])
+
+        return continuous_dynamic_model
+
+    def make_integrator(self):
+        # Integrator
+        states = casadi.SX.sym("states", self.state_dim)
+        ctrls = casadi.SX.sym("ctrls", self.control_dim)
+
+        f = self.make_f()
+        ode = f(x=states, u=ctrls)["x_dot"]
+
+        dae = {"x": states, "p": ctrls, "ode": ode}
+
+        I = casadi.integrator("I", "cvodes", dae, 0, self.control_sampling_time)
+
+        return I
 
 if __name__ == "__main__":
     cart_pole_nmpc = CartPoleNMPC()
@@ -229,9 +274,9 @@ if __name__ == "__main__":
     # # 초기 상태 설정
     # current_state = np.array([0.2, 0.0, 0.0, 0.0])  # 예: [x, theta, x_dot, theta_dot]
 
-    current_state = casadi.DM([0, np.pi, 1, 0])
+    current_state = casadi.DM([0.1, np.pi, 1, 0])
     
-    actual_state_trajectory, actual_control_trajectory, time_steps = cart_pole_nmpc.simulate(current_state, [0, 5])
+    actual_state_trajectory, actual_control_trajectory, time_steps = cart_pole_nmpc.simulate(current_state, [0, 15])
 
     cart_pole_nmpc.visualize(actual_state_trajectory, actual_control_trajectory, time_steps)
 
