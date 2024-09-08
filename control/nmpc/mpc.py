@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-import numpy as np
 
 class MPC(ABC):
     def __init__(self, state_dim, control_dim, prediction_horizon, control_sampling_time):
@@ -28,7 +27,7 @@ class MPC(ABC):
         pass
 
     @abstractmethod
-    def define_constraints(self):
+    def define_constraint(self):
         pass
 
     @abstractmethod
