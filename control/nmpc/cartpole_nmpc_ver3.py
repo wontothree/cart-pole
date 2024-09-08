@@ -26,8 +26,8 @@ class CartPoleNMPC(MPC):
         # Constraints
         self.state_lower_bound = [-0.36, -np.inf, -np.inf, -np.inf]
         self.state_upper_bound = [0.36, np.inf, np.inf, np.inf]
-        self.control_lower_bound = [-1]
-        self.control_upper_bound = [1]
+        self.control_lower_bound = [-10]
+        self.control_upper_bound = [10]
 
         # number of optimization variables
         self.total_variables = (self.prediction_horizon + 1) * self.state_dim + self.prediction_horizon * self.control_dim
@@ -180,7 +180,7 @@ class CartPoleNMPC(MPC):
             optimal_state_trajectory, optimal_control_trajectory = self.solve(current_state)
 
             current_state = I(x0=current_state, p=optimal_control_trajectory[0])["xf"]
-            print(type(current_state))
+
             # 센서로부터 얻은 actual_state_trajectory를 저장해야 한다.
             # actual_state_trajectory.append(optimal_state_trajectory[0])
             actual_state_trajectory.append(current_state.full().ravel())
@@ -274,10 +274,8 @@ if __name__ == "__main__":
     # # 초기 상태 설정
     # current_state = np.array([0.2, 0.0, 0.0, 0.0])  # 예: [x, theta, x_dot, theta_dot]
 
-    current_state = casadi.DM([0.1, np.pi, 1, 0])
+    current_state = casadi.DM([0, np.pi, 0, 0])
     
     actual_state_trajectory, actual_control_trajectory, time_steps = cart_pole_nmpc.simulate(current_state, [0, 15])
 
     cart_pole_nmpc.visualize(actual_state_trajectory, actual_control_trajectory, time_steps)
-
-    # cart_pole_nmpc.simulate(current_state, [0, 5])
