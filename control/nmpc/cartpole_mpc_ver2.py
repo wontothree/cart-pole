@@ -97,7 +97,7 @@ def make_integrator():
 def compute_state_cost(x, u):
     x_diff = x - x_ref
     u_diff = u - u_ref
-    cost = (casadi.dot(Q@x_diff, x_diff)) + casadi.dot(R@u_diff, u_diff) / 2
+    cost = (casadi.dot(Q@x_diff, x_diff) + casadi.dot(R@u_diff, u_diff)) / 2
 
     return cost
 

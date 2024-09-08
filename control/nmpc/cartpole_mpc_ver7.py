@@ -94,7 +94,7 @@ class CartPoleNMPC:
         # State cost calculation
         x_diff = x - self.x_ref
         u_diff = u - self.u_ref
-        cost = (casadi.dot(self.Q @ x_diff, x_diff)) + casadi.dot(self.R @ u_diff, u_diff) / 2
+        cost = (casadi.dot(self.Q @ x_diff, x_diff) + casadi.dot(self.R @ u_diff, u_diff)) / 2
 
         return cost
 

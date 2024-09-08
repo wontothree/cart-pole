@@ -7,6 +7,18 @@
 
 # Functions
 
+|Function|Description|
+|---|---|
+|set_reference_state||
+|set_reference_control||
+|set_initial_state||
+|set_current_state||
+|define_dynamic_model||
+|define_constraints||
+|define_cost_function||
+|solve||
+|||
+
 |Function Name|Input|Return|Description|
 |---|---|---|---|
 |calc_continuous_dynamics|||nonlinear state space model의 함수를 반환한다. $\dot{x} = f(x, u)$에서 f를 반환한다. 이 함수는 continuous state space model을 반환한다.|

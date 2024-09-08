@@ -102,7 +102,7 @@ class CartPoleMPC:
     def compute_state_cost(self, states, ctrls):
         states_diff = states - self.states_ref
         ctrls_diff = ctrls - self.ctrls_ref
-        state_cost = (casadi.dot(self.Q @ states_diff, states_diff)) + casadi.dot(self.R @ ctrls_diff, ctrls_diff) / 2
+        state_cost = (casadi.dot(self.Q @ states_diff, states_diff) + casadi.dot(self.R @ ctrls_diff, ctrls_diff)) / 2
         return state_cost
 
     def compute_terminal_cost(self, states):

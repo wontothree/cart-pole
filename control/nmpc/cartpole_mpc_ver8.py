@@ -88,8 +88,8 @@ class CartPoleNMPC:
     def calc_state_cost(self, x, u):
         x_diff = x - self.x_ref
         u_diff = u - self.u_ref
-        state_cost = (casadi.dot(self.Q @ x_diff, x_diff)) + \
-            casadi.dot(self.R @ u_diff, u_diff) / 2
+        state_cost = (casadi.dot(self.Q @ x_diff, x_diff) + \
+            casadi.dot(self.R @ u_diff, u_diff)) / 2
 
         return state_cost
 
