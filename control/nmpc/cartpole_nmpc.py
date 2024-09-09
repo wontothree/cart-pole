@@ -1,12 +1,15 @@
 import numpy as np
 import casadi
+
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+from matplotlib.animation import FuncAnimation
 
 from mpc import MPC
 
 class CartPoleNMPC(MPC):
     def __init__(self):
-        super().__init__(state_dim=4, control_dim=1, prediction_horizon=20, control_sampling_time=0.1)
+        super().__init__(state_dim=4, control_dim=1, prediction_horizon=10, control_sampling_time=0.05)
 
         # System parameters
         self.gravity = 9.81
@@ -26,8 +29,8 @@ class CartPoleNMPC(MPC):
         # Constraints
         self.state_lower_bound = [-0.36, -np.inf, -np.inf, -np.inf]
         self.state_upper_bound = [0.36, np.inf, np.inf, np.inf]
-        self.control_lower_bound = [-10]
-        self.control_upper_bound = [10]
+        self.control_lower_bound = [-1.5]
+        self.control_upper_bound = [1.5]
 
         # number of optimization variables
         self.total_variables = (self.prediction_horizon + 1) * self.state_dim + self.prediction_horizon * self.control_dim
@@ -194,7 +197,7 @@ class CartPoleNMPC(MPC):
         # Convert state and control trajectories to NumPy arrays
         actual_state_trajectory = np.array(actual_state_trajectory)
         actual_control_trajectory = np.array(actual_control_trajectory)
-         
+        
         # Ensure time_steps is a NumPy array
         time_steps = np.array(time_steps)
         
@@ -265,6 +268,48 @@ class CartPoleNMPC(MPC):
 
         return I
 
+    def animate(self, X, U, t_eval, filename="cart_pole.gif"):
+        # Animation
+        fig = plt.figure(figsize=(18, 9))
+        ax = fig.add_subplot(111)
+        frames = np.arange(0, t_eval.size)
+        fps = 1 / self.control_sampling_time
+
+        def update_figure(i):
+            x_lim_min = -0.36
+            x_lim_max = 0.36
+            y_lim_min = -1
+            y_lim_max = 1
+            u_scale = 40
+
+            ax.cla()
+            ax.set_xlim(x_lim_min, x_lim_max)
+            ax.set_ylim(y_lim_min, y_lim_max)
+            ax.set_aspect("equal")
+            ax.set_title(f"t{t_eval[i]: 0.2f}")
+
+            x, theta, _, _ = X[i]
+            u, = U[i]
+
+            points = np.array([
+                [x, x - self.pole_length * np.sin(theta)],
+                [0, self.pole_length * np.cos(theta)]
+            ])
+
+            ax.hlines(0, x_lim_min, x_lim_max, colors="black")
+            ax.scatter(*points, color="blue", s=0) # dot size
+            ax.plot(*points, color="#c2a28c", lw=6) # pole width
+            ax.arrow(x, 0, u / u_scale, 0, width=0.02, head_width=0.06, head_length=0.12)
+
+            w = 0.1 # cart width
+            h = 0.1 # cart width
+            rect = patches.Rectangle(xy=(x - w / 2, - h / 2), width=w, height=h, color="black")
+            ax.add_patch(rect)
+
+        ani = FuncAnimation(fig, update_figure, frames=frames)
+        ani.save(filename, writer="pillow", fps=fps)
+
+
 if __name__ == "__main__":
     cart_pole_nmpc = CartPoleNMPC()
 
@@ -275,7 +320,9 @@ if __name__ == "__main__":
     # current_state = np.array([0.2, 0.0, 0.0, 0.0])  # 예: [x, theta, x_dot, theta_dot]
 
     current_state = casadi.DM([0, np.pi, 0, 0])
-    
-    actual_state_trajectory, actual_control_trajectory, time_steps = cart_pole_nmpc.simulate(current_state, [0, 15])
+
+    actual_state_trajectory, actual_control_trajectory, time_steps = cart_pole_nmpc.simulate(current_state, [0, 5])
 
     cart_pole_nmpc.visualize(actual_state_trajectory, actual_control_trajectory, time_steps)
+
+    cart_pole_nmpc.animate(actual_state_trajectory, actual_control_trajectory, time_steps, filename="cart_pole.gif")

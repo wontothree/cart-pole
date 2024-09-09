@@ -1,11 +1,5 @@
-# NMPC vs DRL: a comprehensive numerical comparison of model-based and model-free control methodolgies in cart pole
+# Nonlinear Model Predictive Control vs Deep Reinforcement Learning
 
-[Cart Pole Post](https://wontothree.github.io/cartpole)
+[Cart Pole Research Note](https://wontothree.github.io/cartpole)
 
-This repository is for real Cart Pole (Linear Inverted Pendulum)
-
-# Dependencies
-
-```py
-pip install pyserial
-```
+![cart_pole](https://github.com/user-attachments/assets/fd1db385-4559-4eac-bff0-457fb02c2be1)

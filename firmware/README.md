@@ -11,3 +11,9 @@
 |uint16_t|time_last_ctrl|0||
 |uint16_t|time_current||current time|
 |||||
+
+# Dependencies
+
+```py
+pip install pyserial
+```
