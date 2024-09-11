@@ -25,7 +25,7 @@ void init_UART(unsigned int baud) {
 ISR(USART_RX_vect) {
     uint8_t receivedByte = UDR0;
     if ((receivedByte >= '0') && (receivedByte <= '9')) {
-        vel_target = (receivedByte - '0') * 1.5f;
+        target_velcocity = (receivedByte - '0') * 1.5f;
     } else if (receivedByte == ' ') { // 스페이스바 입력
         isDirectionChanged = true; // 방향 전환 플래그 설정
     }
@@ -34,7 +34,6 @@ ISR(USART_RX_vect) {
 
 volatile int direction = 1; // 1 : clockwise, -1 : counter-clockwise
 volatile bool isDirectionChanged = false;
-float vel_target = 1;
 
 // voltage pattern to be applied to each coil of a stepper motor - A, B, A_, B_
 int step_info[8][4] = {
@@ -60,6 +59,7 @@ void moveOneStep() {
   if (step < 0) step = 7;
 }
 
+float target_velcocity = 1;
 void setup() {
   init_UART(9600); 
 
@@ -81,33 +81,34 @@ void setup() {
   // enable interrupts
   interrupts();
 
+  // core logic
   float current_velocity = 0;
-  uint16_t interval = 500;
-  uint16_t last_step_time = 0;
-  uint16_t last_control_time = 0;
-  const uint16_t MOTOR_CONTROL_PERIOD = 30; // ms, 모터 제어 주기 설정
+  uint16_t last_step_count = 0;
+  uint16_t last_control_count = 0;
+  uint16_t step_interval_counts = 500;
+  const uint16_t MOTOR_CONTROL_COUNTS = 30;
 
   while (true) {
-    uint16_t time_current = (uint16_t)TCNT1;
+    uint16_t current_count = (uint16_t)TCNT1; // clock count
 
     // step motor
-    if ((time_current - last_step_time) > interval) {
+    if ((current_count - last_step_count) > step_interval_counts) {
       moveOneStep();
-      last_step_time = time_current;
+      last_step_count = current_count;
     }
 
     // set velocity
-    if ((time_current - last_control_time) > MOTOR_CONTROL_PERIOD) {
+    if ((current_count - last_control_count) > MOTOR_CONTROL_COUNTS) {
       // ...
-      if (current_velocity < vel_target) {
+      if (current_velocity < target_velcocity) {
         current_velocity += 0.001f;
-      } else if (current_velocity > vel_target) {
+      } else if (current_velocity > target_velcocity) {
         current_velocity -= 0.001f;
       }
 
-      interval = (uint16_t)(500.f / current_velocity);
+      step_interval_counts = (uint16_t)(500.f / current_velocity);
       
-      last_control_time = time_current;
+      last_control_count = current_count;
       // ...
     }
 
