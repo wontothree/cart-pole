@@ -29,7 +29,7 @@ float target_velcocity = 1;
 ISR(USART_RX_vect) {
     uint8_t receivedByte = UDR0;
     if ((receivedByte >= '0') && (receivedByte <= '9')) {
-        target_velcocity = (receivedByte - '0') * 1.5f;
+        target_velcocity = (receivedByte - '0') * 0.4f;
     } else if (receivedByte == ' ') { // 스페이스바 입력
         isDirectionChanged = true; // 방향 전환 플래그 설정
     }
@@ -75,7 +75,8 @@ void setup() {
   TCCR1A = 0;  // initialize TCCR1A register
   TCCR1B = 0;  // initialize TCCR1B register
   TCNT1 = 0;   // set timer 1 count to 0
-  TCCR1B |= (1 << CS11) | (1 << CS10); // timer 1, 64분주 mode
+  // TCCR1B |= (1 << CS11) | (1 << CS10); // 64분주 mode
+  TCCR1B = (1 << CS11); // 8 분주
 
   // enable interrupts
   interrupts();
@@ -84,8 +85,8 @@ void setup() {
   float current_velocity = 1;
   uint16_t last_step_count = 0;
   uint16_t last_control_count = 0;
-  uint16_t step_interval_counts = 60;
-  const uint16_t MOTOR_CONTROL_COUNTS = 30;
+  uint16_t step_interval_counts = 314;
+  const uint16_t MOTOR_CONTROL_COUNTS = 200;
 
   while (true) {
     // clock count
@@ -101,12 +102,12 @@ void setup() {
     if ((current_count - last_control_count) > MOTOR_CONTROL_COUNTS) {
       // ...
       if (current_velocity < target_velcocity) {
-        current_velocity += 0.001f;
+        current_velocity += 0.0008f;
       } else if (current_velocity > target_velcocity) {
-        current_velocity -= 0.001f;
+        current_velocity -= 0.0008f;
       }
 
-      step_interval_counts = (uint16_t)(200.f / current_velocity);
+      step_interval_counts = (uint16_t)(314.f / current_velocity);
       
       last_control_count = current_count;
       // ...
