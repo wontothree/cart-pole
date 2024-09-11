@@ -5,7 +5,7 @@
 |Function Name|Description|
 |---|---|
 |init_UART||
-|doStep|apply voltage to each coils A, B, A_, B_|
+|moveOneStep|apply voltage to each coils A, B, A_, B_|
 |setup||
 |loop||
 

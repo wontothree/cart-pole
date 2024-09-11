@@ -49,7 +49,7 @@ int step_info[8][4] = {
 };
 
 // apply voltage to each coils A, B, A_, B_
-void doStep() {
+void moveOneStep() {
   static int step = 0;
   digitalWrite(PIN_A, step_info[step][0]);
   digitalWrite(PIN_B, step_info[step][1]);
@@ -81,34 +81,34 @@ void setup() {
   // enable interrupts
   interrupts();
 
-  float vel_current = 0;
+  float current_velocity = 0;
   uint16_t interval = 500;
-  uint16_t time_last_step = 0;
-  uint16_t time_last_controller_ctrl = 0;
-  const uint16_t PERIOD_MOTOR_CTRL = 30; // ms, 모터 제어 주기 설정
+  uint16_t last_step_time = 0;
+  uint16_t last_control_time = 0;
+  const uint16_t MOTOR_CONTROL_PERIOD = 30; // ms, 모터 제어 주기 설정
 
   while (true) {
     uint16_t time_current = (uint16_t)TCNT1;
 
     // step motor
-    if ((time_current - time_last_step) > interval) {
-      doStep();
-      time_last_step = time_current;
+    if ((time_current - last_step_time) > interval) {
+      moveOneStep();
+      last_step_time = time_current;
     }
 
     // set velocity
-    if ((time_current - time_last_controller_ctrl) > PERIOD_MOTOR_CTRL) {
-      if (vel_current < vel_target) {
-        vel_current += 0.001f;
-        // if (vel_current > vel_target) vel_current = vel_target;
-      } else if (vel_current > vel_target) {
-        vel_current -= 0.001f;
-        // if (vel_current < vel_target) vel_current = vel_target;
+    if ((time_current - last_control_time) > MOTOR_CONTROL_PERIOD) {
+      // ...
+      if (current_velocity < vel_target) {
+        current_velocity += 0.001f;
+      } else if (current_velocity > vel_target) {
+        current_velocity -= 0.001f;
       }
 
-      interval = (uint16_t)(500.f / vel_current);
+      interval = (uint16_t)(500.f / current_velocity);
       
-      time_last_controller_ctrl = time_current;
+      last_control_time = time_current;
+      // ...
     }
 
     // set direction
