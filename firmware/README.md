@@ -4,9 +4,10 @@
 
 |Function Name|Description|
 |---|---|
+|init_UART||
 |doStep|apply voltage to each coils A, B, A_, B_|
-|UART_init||
 |setup||
+|loop||
 
 # Variables
 
