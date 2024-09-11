@@ -98,13 +98,13 @@ void setup() {
       last_step_count = current_count;
     }
 
-    // set velocity
+    // set d
     if ((current_count - last_control_count) > MOTOR_CONTROL_COUNTS) {
       // ...
       if (current_velocity < target_velcocity) {
-        current_velocity += 0.0008f;
+        current_velocity += 0.0005f;
       } else if (current_velocity > target_velcocity) {
-        current_velocity -= 0.0008f;
+        current_velocity -= 0.0005f;
       }
 
       step_interval_counts = (uint16_t)(314.f / current_velocity);
