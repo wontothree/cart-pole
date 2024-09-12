@@ -10,11 +10,11 @@ class MPC(ABC):
         # number of optimization variables
         self.total_variables = (prediction_horizon + 1) * state_dim + prediction_horizon * control_dim
 
-    def set_reference_state(self, reference_state):
-        self.reference_state = reference_state
+    def set_target_state(self, target_state):
+        self.target_state = target_state
 
-    def set_reference_control(self, reference_control):
-        self.reference_control = reference_control
+    def set_target_control(self, target_control):
+        self.target_control = target_control
 
     @abstractmethod
     def define_dynamic_model(self, state, control):

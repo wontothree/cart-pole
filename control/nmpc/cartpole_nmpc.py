@@ -27,10 +27,10 @@ class CartPoleNMPC(MPC):
         self.R = casadi.diag([0.1])
 
         # Constraints
-        self.state_lower_bound = [-0.36, -np.inf, -np.inf, -np.inf]
-        self.state_upper_bound = [0.36, np.inf, np.inf, np.inf]
-        self.control_lower_bound = [-1.5]
-        self.control_upper_bound = [1.5]
+        self.state_lower_bound = [-0.34, -np.inf, -np.inf, -np.inf]
+        self.state_upper_bound = [0.34, np.inf, np.inf, np.inf]
+        self.control_lower_bound = [-1.2]
+        self.control_upper_bound = [1.2]
 
         # number of optimization variables
         self.total_variables = (self.prediction_horizon + 1) * self.state_dim + self.prediction_horizon * self.control_dim
@@ -105,15 +105,23 @@ class CartPoleNMPC(MPC):
 
         # state cost
         for step in range(self.prediction_horizon):
-            state_error = state_trajectory[step] - self.reference_state
-            control_error = control_trajectory[step] - self.reference_control
+            state_error = state_trajectory[step] - self.target_state
+
+            # normalize angle
+            # state_error[1] = (state_error[1] + np.pi) % (2 * np.pi) - np.pi
+            state_error[1] = casadi.fmod(state_error[1] + casadi.pi, 2 * casadi.pi) - casadi.pi
+
+            control_error = control_trajectory[step] - self.target_control
 
             state_step_cost = (casadi.dot(self.Q @ state_error, state_error) + casadi.dot(self.R @ control_error, control_error)) / 2
 
             state_cost += state_step_cost * self.control_sampling_time
         
         # terminal cost
-        state_error = state_trajectory[-1] - self.reference_state
+        state_error = state_trajectory[-1] - self.target_state
+        # state_error[1] = (state_error[1] + np.pi) % (2 * np.pi) - np.pi
+        state_error[1] = casadi.fmod(state_error[1] + casadi.pi, 2 * casadi.pi) - casadi.pi
+
         terminal_cost = casadi.dot(self.Q_f @ state_error, state_error)
 
         cost = state_cost + terminal_cost
@@ -185,7 +193,6 @@ class CartPoleNMPC(MPC):
             current_state = I(x0=current_state, p=optimal_control_trajectory[0])["xf"]
 
             # 센서로부터 얻은 actual_state_trajectory를 저장해야 한다.
-            # actual_state_trajectory.append(optimal_state_trajectory[0])
             actual_state_trajectory.append(current_state.full().ravel())
             actual_control_trajectory.append(optimal_control_trajectory[0])
 
@@ -313,8 +320,8 @@ class CartPoleNMPC(MPC):
 if __name__ == "__main__":
     cart_pole_nmpc = CartPoleNMPC()
 
-    cart_pole_nmpc.set_reference_state(casadi.DM([0, 0, 0, 0]))
-    cart_pole_nmpc.set_reference_control(casadi.DM([0]))
+    cart_pole_nmpc.set_target_state(casadi.DM([0, 0, 0, 0]))
+    cart_pole_nmpc.set_target_control(casadi.DM([0]))
 
     # # 초기 상태 설정
     # current_state = np.array([0.2, 0.0, 0.0, 0.0])  # 예: [x, theta, x_dot, theta_dot]
