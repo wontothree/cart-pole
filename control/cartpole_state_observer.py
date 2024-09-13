@@ -47,12 +47,11 @@ if __name__ == "__main__":
             measure_pole_angle_return = state_observer.measure_pole_angle()
             if measure_pole_angle_return is not None:
                 pole_angle, pole_angle_observing_time = measure_pole_angle_return
-                a = state_observer.estimate_pole_angular_velocity(pole_angle, pole_angle_observing_time)
-                print(a)
+                pole_angular_velocity = state_observer.estimate_pole_angular_velocity(pole_angle, pole_angle_observing_time)
+                print(pole_angular_velocity)
 
     except serial.SerialException as e:
         print(f"SerialException: {e}")
     finally:
         if state_observer.serial.is_open:
             state_observer.serial.close()
-
