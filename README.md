@@ -8,5 +8,3 @@
 - mass of pole : 0.089 kg (88.68g)
 - length of pole : 0.4m (40cm)
 - inertia of pole : 0.004 746 kg m^2
-
-![](./imgs/cart_pole.gif.gif)
