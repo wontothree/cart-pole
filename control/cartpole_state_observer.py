@@ -1,70 +1,37 @@
 import serial
 import time
 
-class CartPoleStateEstimator:
+class CartPoleStateObserver:
     def __init__(self, port='COM5', baudrate=38400, timeout=0.01):
         # set serial port
         self.serial = serial.Serial(port, baudrate, timeout=timeout)
 
-        self.cart_position = None
-        self.cart_velocity = None
-        self.pole_current_angle = None
         self.pole_previous_angle = None
-        self.pole_angular_velocity = None
-
-        self.observe_previous_time = time.time()
+        self.pole_previous_angle_observing_time = None
 
     def measure_pole_angle(self):
-        try:
-            while True:
-                # is data in buffer
-                if self.serial.in_waiting > 0:
-                    # read data
-                    encoder_data = self.serial.readline().decode('utf-8').strip()
-                    print(encoder_data)
+        # check if data is available in the buffer
+        if self.serial.in_waiting > 0:
+            # read data from the serial port
+            pole_angle_from_encoder = float(self.serial.readline().decode('utf-8').strip())
+            pole_angle = pole_angle_from_encoder
+            pole_angle_observing_time = time.time()
 
-                    # if encoder_data:
-                    #     # encoder_data = encoder_data.split(',')
+            return pole_angle, pole_angle_observing_time
 
-                    #     if len(encoder_data) == 3:
-                    #         # self.pole_current_angle = float(encoder_data[0].strip().replace("Degree: ", ''))
-                    #         # print(self.pole_current_angle)
-
-
-
-                            # # test
-                            # if self.pole_previous_angle is None:
-                            #     self.pole_previous_angle = self.pole_current_angle
-                            # elif self.pole_previous_angle is not None:
-                            #     observe_current_time = time.time()
-                            #     delta_time = observe_current_time - self.observe_previous_time
-
-                            #     if delta_time > 0:
-                            #         self.pole_angular_velocity = (self.pole_current_angle - self.pole_previous_angle) / delta_time
-
-                            #         print(f"Angular Velocity of Pole: {self.pole_angular_velocity} degrees per second")
-                            
-                            #     self.observe_previous_time = observe_current_time
-                            #     self.pole_previous_angle = self.pole_current_angle
-
-        except serial.SerialException as e:
-            print(f"SerialException: {e}")
-        finally:
-            if self.serial.is_open:
-                self.serial.close()
-
-    def estimate_pole_angular_velocity(self):
-        if self.pole_previous_angle is not None:
-            observe_current_time = time.time()
-            delta_time = observe_current_time - self.observe_previous_time
-
+    def estimate_pole_angular_velocity(self, pole_angle, pole_angle_observing_time):
+        if self.pole_previous_angle_observing_time is None:
+            self.pole_previous_angle = pole_angle
+            self.pole_previous_angle_observing_time = pole_angle_observing_time
+        else:
+            delta_time = pole_angle_observing_time - self.pole_previous_angle_observing_time
             if delta_time > 0:
-                self.angular_velocity = (self.pole_current_angle - self.pole_previous_angle) / delta_time
+                pole_angular_velocity = (pole_angle - self.pole_previous_angle) / delta_time
 
-                print(f"Angular Velocity of Pole: {self.pole_angular_velocity:.2f} degrees per second")
-        
-            self.observe_previous_time = observe_current_time
-            self.pole_previous_angle = self.pole_current_angle
+                self.pole_previous_angle = pole_angle
+                self.pole_previous_angle_observing_time = pole_angle_observing_time
+
+                return pole_angular_velocity
 
     def estimate_cart_position(self):
         pass
@@ -73,6 +40,19 @@ class CartPoleStateEstimator:
         pass
 
 if __name__ == "__main__":
-    estimator = CartPoleStateEstimator()
-    estimator.measure_pole_angle()
-    # estimator.estimate_pole_angular_velocity()
+    state_observer = CartPoleStateObserver()
+
+    try:
+        while True:
+            measure_pole_angle_return = state_observer.measure_pole_angle()
+            if measure_pole_angle_return is not None:
+                pole_angle, pole_angle_observing_time = measure_pole_angle_return
+                a = state_observer.estimate_pole_angular_velocity(pole_angle, pole_angle_observing_time)
+                print(a)
+
+    except serial.SerialException as e:
+        print(f"SerialException: {e}")
+    finally:
+        if state_observer.serial.is_open:
+            state_observer.serial.close()
+
