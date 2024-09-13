@@ -2,7 +2,4 @@
 
 [Cart Pole Research Note](https://wontothree.github.io/cartpole)
 
-![cart_pole](https://github.com/user-attachments/assets/ad6155ef-6c6b-41e0-937b-4d5df219dcc3)
-
-
-
+![cart_pole](https://github.com/user-attachments/assets/c034ff94-a9c9-4964-a9ec-e88a63ced1ec)
