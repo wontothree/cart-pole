@@ -112,7 +112,7 @@ class Simulation():
         X = np.array(X)
         
         # animation setup
-        fig = plt.figure(figsize=(18, 18)) # size
+        fig = plt.figure(figsize=(10, 10)) # size
         ax = fig.add_subplot(111)
         frames = np.arange(0, t_eval.size) # frame numbers
         fps = 1 / self.cart_pole_nmpc.control_sampling_time
@@ -130,7 +130,7 @@ class Simulation():
             ax.set_xlim(x_lim_min, x_lim_max)
             ax.set_ylim(y_lim_min, y_lim_max)
             ax.set_aspect("equal")
-            ax.set_title(f"Cart Pole (Time = {t_eval[i]: 0.2f})", fontsize=30)
+            ax.set_title(f"Cart Pole (Time = {t_eval[i]: 0.2f})", fontsize=20)
             ax.set_facecolor("#f0f0f0")  # Set background color
 
             # extract state and input values
@@ -150,15 +150,15 @@ class Simulation():
             ax.hlines(0, x_lim_min, x_lim_max, colors="black")
 
             # Plot the pole and its shadow
-            ax.plot(*points, color="#c2a28c", lw=14, zorder=1)  # Pole
+            ax.plot(*points, color="#c2a28c", lw=12, zorder=1)  # Pole
             ax.plot(*points, color="grey", lw=8, alpha=0.5, zorder=0)  # Pole shadow
 
             # arrow
             ax.arrow(x, 0, u / u_scale, 0, width=0.01, head_width=0.03, head_length=0.24, color="grey" if u > 0 else "grey")
 
             # cart
-            w = 0.05  # width
-            h = 0.05  # height
+            w = 0.07  # width
+            h = 0.07  # height
             rect = patches.Rectangle(xy=(x - w / 2, - h / 2), width=w, height=h, color="black")  # Cart color
             ax.add_patch(rect)
 
@@ -168,7 +168,7 @@ class Simulation():
                         f"velocity of cart: {x_dot:.2f} m/s\n"
                         f"angular velocity of pole: {theta_dot:.2f} rad/s\n"
                         f"force: {u:.2f} N")
-            ax.text(x_lim_max - 0.8, y_lim_max - 0.3, state_and_input_text, fontsize=25,
+            ax.text(x_lim_max - 0.85, y_lim_max - 0.3, state_and_input_text, fontsize=15,
                     bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5'))
 
         # Create and save the animation
