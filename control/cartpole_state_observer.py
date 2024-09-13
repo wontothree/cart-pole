@@ -16,29 +16,21 @@ class CartPoleStateEstimator:
 
     def measure_pole_angle(self):
         try:
-            start_time = time.time()
-
             while True:
                 # is data in buffer
                 if self.serial.in_waiting > 0:
-
-                    print(self.serial.in_waiting)
-
                     # read data
+                    encoder_data = self.serial.readline().decode('utf-8').strip()
+                    print(encoder_data)
 
-                    ang = self.serial.readline().decode('utf-8').strip()
-                    end_time = time.time()
-                    print(end_time - start_time)
+                    # if encoder_data:
+                    #     # encoder_data = encoder_data.split(',')
 
-                    start_time = end_time
+                    #     if len(encoder_data) == 3:
+                    #         # self.pole_current_angle = float(encoder_data[0].strip().replace("Degree: ", ''))
+                    #         # print(self.pole_current_angle)
 
-                    # if ang:
-                    #     data = ang.split(',')
-                    #     if len(data) == 3:
-                    #         self.pole_current_angle, pole_revolution, pole_rpm = data
-                    #         self.pole_current_angle = float(data[0].strip().replace('Degree: ', ''))
-                    #         print(data)
-                            # print(self.pole_current_angle)
+
 
                             # # test
                             # if self.pole_previous_angle is None:
