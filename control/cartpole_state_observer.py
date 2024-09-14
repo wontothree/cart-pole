@@ -9,6 +9,15 @@ class CartPoleStateObserver:
         self.pole_previous_angle = None
         self.pole_previous_angle_observing_time = None
 
+    def calibrate_cart_position(self):
+        print("Calibrating cart position start!")
+
+    def estimate_cart_position(self):
+        pass
+
+    def estimate_cart_velocity(self):
+        pass
+
     def measure_pole_angle(self):
         # check if data is available in the buffer
         if self.serial.in_waiting > 0:
@@ -32,12 +41,6 @@ class CartPoleStateObserver:
                 self.pole_previous_angle_observing_time = pole_angle_observing_time
 
                 return pole_angular_velocity
-
-    def estimate_cart_position(self):
-        pass
-
-    def estimate_cart_velocity(self):
-        pass
 
 if __name__ == "__main__":
     state_observer = CartPoleStateObserver()
