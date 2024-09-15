@@ -29,20 +29,18 @@ void setup() {
   uint16_t last_control_count = 0;
   uint16_t step_interval_counts = 314;
   const uint16_t MOTOR_CONTROL_COUNTS = 200;
- const uint16_t UART_UPDATE_INTERVAL = 30537; // 10초마다 출력
+  const uint16_t UART_UPDATE_INTERVAL = 30537; // 10초마다 출력
   uint16_t last_uart_update = 0;
 
   while (true) {
     // clock count
     uint16_t current_count = (uint16_t)TCNT1;
 
-    // step motor
+    // step motor controller
     if ((current_count - last_step_count) > step_interval_counts) {
       moveOneStep();
       last_step_count = current_count;
     }
-
-    // set motor
     if ((current_count - last_control_count) > MOTOR_CONTROL_COUNTS) {
       if (current_velocity < target_velcocity) {
         current_velocity += 0.0005f;
