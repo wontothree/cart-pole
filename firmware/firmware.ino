@@ -29,7 +29,7 @@ void setup() {
   uint16_t last_control_count = 0;
   uint16_t step_interval_counts = 314;
   const uint16_t MOTOR_CONTROL_COUNTS = 200;
-  const uint16_t UART_UPDATE_INTERVAL = 3;
+ const uint16_t UART_UPDATE_INTERVAL = 30537; // 10초마다 출력
   uint16_t last_uart_update = 0;
 
   while (true) {
