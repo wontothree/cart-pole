@@ -19,21 +19,21 @@ void initialize_uart(unsigned int baud) {
 }
 
 // UART 송신 함수 구현
-void uart_send_char(char c) {
+void send_uart_char(char c) {
     while (!(UCSR0A & (1 << UDRE0))); // 데이터 레지스터가 비어 있는지 확인
     UDR0 = c; // 데이터 레지스터에 문자 전송
 }
 
-void uart_send_string(const char* str) {
+void send_uart_string(const char* str) {
     while (*str) {
-        uart_send_char(*str++);
+        send_uart_char(*str++);
     }
 }
 
-void uart_send_int(int16_t num) {
+void send_uart_int(int16_t num) {
     char buffer[6]; // -5000에서 5000까지의 숫자를 문자열로 표현하기 위한 버퍼
     snprintf(buffer, sizeof(buffer), "%d", num); // 정수를 문자열로 변환
-    uart_send_string(buffer); // 문자열 전송
+    send_uart_string(buffer); // 문자열 전송
 }
 
 // UART 수신 인터럽트 핸들러 구현

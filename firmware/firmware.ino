@@ -1,5 +1,5 @@
 #include "uart.hpp"
-#include "stepper_motor.hpp"
+#include "stpper_motor.hpp"
 
 void setup() {
   initialize_uart(9600); 
@@ -29,6 +29,8 @@ void setup() {
   uint16_t last_control_count = 0;
   uint16_t step_interval_counts = 314;
   const uint16_t MOTOR_CONTROL_COUNTS = 200;
+  const uint16_t UART_UPDATE_INTERVAL = 3;
+  uint16_t last_uart_update = 0;
 
   while (true) {
     // clock count
@@ -61,11 +63,15 @@ void setup() {
       isDirectionChanged = false;
       interrupts();
     }
-
-    noInterrupts(); // 인터럽트 비활성화
-    uart_send_string("Stepping Motor Tick: ");
-    uart_send_int(stepper_motor_tick);
-    uart_send_char('\n'); // 줄바꿈 문자 전송
-    interrupts(); // 인터럽트 활성화
+  
+    // // UART communication
+    // if ((current_count - last_uart_update) > UART_UPDATE_INTERVAL) {
+    //   noInterrupts();
+    //   send_uart_string("Stepping Motor Tick: ");
+    //   send_uart_int(stepper_motor_tick);
+    //   send_uart_char('\n');
+    //   interrupts();
+    //   last_uart_update = current_count;
+    // }
   }
 }
