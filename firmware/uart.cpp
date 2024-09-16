@@ -1,5 +1,4 @@
 #include "uart.hpp"
-#include "globals.hpp"
 
 // UART 초기화 함수 구현
 void initialize_uart(unsigned int baud) {

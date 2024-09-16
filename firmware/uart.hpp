@@ -3,7 +3,9 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <stdio.h>  // sprintf 사용을 위해 추가
+#include <stdio.h>  // for sprintf
+
+#include "globals.hpp"
 
 void initialize_uart(unsigned int baud);
 

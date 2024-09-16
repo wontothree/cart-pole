@@ -1,12 +1,37 @@
-#include "motor_controller.hpp"
-#include <avr/interrupt.h>  // for `noInterrupts()` and `interrupts()`
+#include "stepper_motor_controller.hpp"
 
-// // 전역 변수 정의
-// volatile int direction = 1;        // 1 : 시계방향, -1 : 반시계방향
-// volatile bool isDirectionChanged = false;
-// float target_velcocity = 1;
+int step_info[8][4] = {
+  { HIGH, LOW, LOW, LOW },
+  { HIGH, HIGH, LOW, LOW },
+  { LOW, HIGH, LOW, LOW },
+  { LOW, HIGH, HIGH, LOW },
+  { LOW, LOW, HIGH, LOW },
+  { LOW, LOW, HIGH, HIGH },
+  { LOW, LOW, LOW, HIGH },
+  { HIGH, LOW, LOW, HIGH }
+};
 
-void initialize_motor() {
+volatile int16_t stepper_motor_tick = 0;
+
+void moveOneStep() {
+  static int step = 0;
+  digitalWrite(PIN_A, step_info[step][0]);
+  digitalWrite(PIN_B, step_info[step][1]);
+  digitalWrite(PIN_NA, step_info[step][2]);
+  digitalWrite(PIN_NB, step_info[step][3]);
+  step += direction;
+  if (step > 7) step = 0;
+  if (step < 0) step = 7;
+
+  stepper_motor_tick += direction;
+}
+
+
+
+
+
+
+void initialize_motor_pins() {
     pinMode(PIN_A, OUTPUT);
     pinMode(PIN_B, OUTPUT);
     pinMode(PIN_NA, OUTPUT);
@@ -24,9 +49,9 @@ void control_motor(uint16_t current_count, float& current_velocity, uint16_t& la
     }
 
     if ((current_count - last_control_count) > MOTOR_CONTROL_COUNTS) {
-        if (current_velocity < target_velcocity) {
+        if (current_velocity < target_velocity) {
             current_velocity += 0.0005f;
-        } else if (current_velocity > target_velcocity) {
+        } else if (current_velocity > target_velocity) {
             current_velocity -= 0.0005f;
         }
 

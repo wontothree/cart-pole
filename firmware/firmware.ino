@@ -1,17 +1,12 @@
 #include "globals.hpp"
+#include "stepper_motor_controller.hpp"
 #include "uart.hpp"
-#include "stepper_motor.hpp"
 #include "timer.hpp"
-// #include "motor_controller.hpp"
 
 void setup() {
   initialize_uart(9600); 
 
-  // set stepper motor pins as outputs
-  pinMode(PIN_A, OUTPUT);
-  pinMode(PIN_B, OUTPUT);
-  pinMode(PIN_NA, OUTPUT);
-  pinMode(PIN_NB, OUTPUT);
+  initialize_motor_pins();
 
   initialize_timer1(8);
 
@@ -20,8 +15,6 @@ void setup() {
   uint16_t last_step_count = 0;
   uint16_t last_control_count = 0;
   uint16_t step_interval_counts = 314;
-  const uint16_t MOTOR_CONTROL_COUNTS = 200;
-  const uint16_t UART_UPDATE_INTERVAL = 30537; // 10초마다 출력
   uint16_t last_uart_update = 0;
 
   while (true) {
@@ -33,6 +26,7 @@ void setup() {
       moveOneStep();
       last_step_count = current_count;
     }
+
     if ((current_count - last_control_count) > MOTOR_CONTROL_COUNTS) {
       if (current_velocity < target_velocity) {
         current_velocity += 0.0005f;
