@@ -15,4 +15,5 @@
 
 # Hardware
 
-Arduino UNO R3
+- Arduino UNO R4
+- Arduino UNO R3

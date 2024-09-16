@@ -13,4 +13,4 @@
 
 # Block Diagram
 
-![block-diagram](https://github.com/user-attachments/assets/d35adfa0-c6b6-4955-b9fa-87d969384330)
+![block-diagram](https://github.com/user-attachments/assets/8c8b2d22-6f9f-4e63-b53d-9e3768450cb8)
