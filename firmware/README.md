@@ -2,20 +2,18 @@
 
     firmware
     ├── firmware.ino                          # arduino code
-    ├── stepper_motor.hpp                     # stepper motor
-    ├── stepper_motor.cpp                     #
-    ├── motor_controller.hpp                  # motor controller
-    ├── motor_controller.cpp                  #
+    ├── stepper_motor_controller.hpp          # **stepper motor controller**
+    ├── stepper_motor_controller.cpp          #
+    ├── globals.hpp                           # global variables and constants
+    ├── globals.cpp                           #
     ├── uart.hpp                              # communication
     ├── uart.cpp                              #
     ├── timer.hpp                             #
     ├── timer.cpp                             #
-    ├── globals.hpp                           # global variables and constants
-    ├── globals.cpp                           #
 
     ├── main.hpp                              #
     ├── main.cpp                              #
-    ├── state_observer.hpp                    # state estimator (cart position, cart velocity, pole angle, pole angular velocity)
+    ├── state_observer.hpp                    # state estimator
     ├── state_observer.cpp                    #
 
 # Hardware

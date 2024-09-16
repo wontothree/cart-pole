@@ -18,6 +18,8 @@ void moveOneStep();
 
 void initialize_motor_pins();
 
-void control_motor(uint16_t current_count, float& current_velocity, uint16_t& last_step_count, uint16_t& last_control_count, uint16_t& step_interval_counts);
+// void update_motor_control(float& current_velocity, uint16_t& step_interval_counts, uint16_t current_count, float target_velocity);
+void update_motor_control(uint16_t current_count, uint16_t& step_interval_counts, float& current_velocity, float target_velocity);
+void handle_motor_direction();
 
 #endif // STEPPER_HPP
