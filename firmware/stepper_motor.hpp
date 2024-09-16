@@ -1,14 +1,9 @@
-#ifndef STEPPER_
+#ifndef STEPPER_HPP
 #define STEPPER_HPP
 
-#include "uart.hpp" // 전역 변수
 #include <Arduino.h> // For digitalWrite and pinMode
 
-// define pin numbers
-#define PIN_A 10
-#define PIN_NA 11
-#define PIN_B 12
-#define PIN_NB 13
+#include "globals.hpp"
 
 extern volatile int16_t stepper_motor_tick;
 

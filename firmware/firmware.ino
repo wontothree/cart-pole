@@ -1,5 +1,8 @@
+#include "globals.hpp"
 #include "uart.hpp"
-#include "stpper_motor.hpp"
+#include "stepper_motor.hpp"
+#include "timer.hpp"
+// #include "motor_controller.hpp"
 
 void setup() {
   initialize_uart(9600); 
@@ -10,18 +13,7 @@ void setup() {
   pinMode(PIN_NA, OUTPUT);
   pinMode(PIN_NB, OUTPUT);
 
-  // disable interrupts
-  noInterrupts();
-
-  // set timer (Timer1)
-  TCCR1A = 0;  // initialize TCCR1A register
-  TCCR1B = 0;  // initialize TCCR1B register
-  TCNT1 = 0;   // set timer 1 count to 0
-  // TCCR1B |= (1 << CS11) | (1 << CS10); // 64 분주 mode
-  TCCR1B = (1 << CS11); // 8 분주
-
-  // enable interrupts
-  interrupts();
+  initialize_timer1(8);
 
   // core logic
   float current_velocity = 1;
@@ -34,7 +26,7 @@ void setup() {
 
   while (true) {
     // clock count
-    uint16_t current_count = (uint16_t)TCNT1;
+    uint16_t current_count = get_timer1_count();
 
     // step motor controller
     if ((current_count - last_step_count) > step_interval_counts) {
@@ -42,9 +34,9 @@ void setup() {
       last_step_count = current_count;
     }
     if ((current_count - last_control_count) > MOTOR_CONTROL_COUNTS) {
-      if (current_velocity < target_velcocity) {
+      if (current_velocity < target_velocity) {
         current_velocity += 0.0005f;
-      } else if (current_velocity > target_velcocity) {
+      } else if (current_velocity > target_velocity) {
         current_velocity -= 0.0005f;
       }
 

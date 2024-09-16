@@ -1,9 +1,5 @@
 #include "uart.hpp"
-
-// 전역 변수 정의
-volatile int direction = 1;        // 1 : clockwise, -1 : counter-clockwise
-volatile bool isDirectionChanged = false;
-float target_velcocity = 1;
+#include "globals.hpp"
 
 // UART 초기화 함수 구현
 void initialize_uart(unsigned int baud) {
@@ -40,7 +36,7 @@ void send_uart_int(int16_t num) {
 ISR(USART_RX_vect) {
     uint8_t receivedByte = UDR0;
     if ((receivedByte >= '0') && (receivedByte <= '9')) {
-        target_velcocity = (receivedByte - '0') * 0.4f;
+        target_velocity = (receivedByte - '0') * 0.4f;
     } else if (receivedByte == ' ') { // 스페이스바 입력
         isDirectionChanged = true; // 방향 전환 플래그 설정
     }
