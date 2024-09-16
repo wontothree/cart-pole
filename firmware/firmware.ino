@@ -23,14 +23,13 @@ void setup() {
 
     handle_motor_direction();
 
-    // // UART communication
-    // if ((current_count - last_uart_update) > UART_UPDATE_INTERVAL) {
-    //   noInterrupts();
-    //   // send_uart_string("Stepping Motor Tick: ");
-    //   send_uart_int(stepper_motor_tick);
-    //   // send_uart_char('\n');
-    //   interrupts();
-    //   last_uart_update = current_count;
-    // }
+    // UART communication
+    if ((current_count - last_uart_update) > UART_UPDATE_INTERVAL) {
+        // noInterrupts(); // UART 송신 중 인터럽트를 비활성화
+        send_uart_int(stepper_motor_tick);
+        send_uart_char('\n');
+        // interrupts(); // 인터럽트를 다시 활성화
+        last_uart_update = current_count;
+    }
   }
 }

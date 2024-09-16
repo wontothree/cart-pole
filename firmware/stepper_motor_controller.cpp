@@ -11,7 +11,7 @@ int step_info[8][4] = {
   { HIGH, LOW, LOW, HIGH }
 };
 
-volatile int16_t stepper_motor_tick = 0;
+// volatile int16_t stepper_motor_tick = 0;
 
 void moveOneStep() {
   static int step = 0;
@@ -25,10 +25,6 @@ void moveOneStep() {
 
   stepper_motor_tick += direction;
 }
-
-
-
-
 
 
 void initialize_motor_pins() {
