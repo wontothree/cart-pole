@@ -17,7 +17,7 @@ void setup() {
   TCCR1A = 0;  // initialize TCCR1A register
   TCCR1B = 0;  // initialize TCCR1B register
   TCNT1 = 0;   // set timer 1 count to 0
-  // TCCR1B |= (1 << CS11) | (1 << CS10); // 64분주 mode
+  // TCCR1B |= (1 << CS11) | (1 << CS10); // 64 분주 mode
   TCCR1B = (1 << CS11); // 8 분주
 
   // enable interrupts
@@ -29,7 +29,7 @@ void setup() {
   uint16_t last_control_count = 0;
   uint16_t step_interval_counts = 314;
   const uint16_t MOTOR_CONTROL_COUNTS = 200;
- const uint16_t UART_UPDATE_INTERVAL = 30537; // 10초마다 출력
+  const uint16_t UART_UPDATE_INTERVAL = 30537; // 10초마다 출력
   uint16_t last_uart_update = 0;
 
   while (true) {
@@ -58,7 +58,7 @@ void setup() {
     // set direction
     if (isDirectionChanged) {
       noInterrupts();
-      delay(50);  // 잠시 멈추고
+      // delay(50);
       direction = (direction == 1) ? -1 : 1;
       isDirectionChanged = false;
       interrupts();
@@ -67,9 +67,9 @@ void setup() {
     // // UART communication
     // if ((current_count - last_uart_update) > UART_UPDATE_INTERVAL) {
     //   noInterrupts();
-    //   send_uart_string("Stepping Motor Tick: ");
+    //   // send_uart_string("Stepping Motor Tick: ");
     //   send_uart_int(stepper_motor_tick);
-    //   send_uart_char('\n');
+    //   // send_uart_char('\n');
     //   interrupts();
     //   last_uart_update = current_count;
     // }
