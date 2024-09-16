@@ -11,8 +11,6 @@ int step_info[8][4] = {
   { HIGH, LOW, LOW, HIGH }
 };
 
-// volatile int16_t stepper_motor_tick = 0;
-
 void moveOneStep() {
   static int step = 0;
   digitalWrite(PIN_A, step_info[step][0]);
@@ -25,7 +23,6 @@ void moveOneStep() {
 
   stepper_motor_tick += direction;
 }
-
 
 void initialize_motor_pins() {
     pinMode(PIN_A, OUTPUT);
@@ -50,7 +47,7 @@ void update_motor_control(uint16_t current_count, uint16_t& step_interval_counts
             current_velocity -= 0.0005f;
         }
 
-        step_interval_counts = (uint16_t)(314.f / current_velocity);
+        step_interval_counts = (uint16_t)(40.f / current_velocity);
         
         last_control_count = current_count;
     }

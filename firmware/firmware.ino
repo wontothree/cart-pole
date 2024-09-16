@@ -8,10 +8,10 @@ void setup() {
 
   initialize_motor_pins();
 
-  initialize_timer1(8);
+  initialize_timer1(64);
 
   float current_velocity = 1;
-  uint16_t step_interval_counts = 314;
+  uint16_t step_interval_counts = 40; // 8분주 : 314
 
   uint16_t last_uart_update = 0;
 
