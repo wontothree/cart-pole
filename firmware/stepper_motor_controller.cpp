@@ -22,6 +22,7 @@ void moveOneStep() {
   if (step < 0) step = 7;
 
   stepper_motor_tick += direction;
+  stepper_motor_tick_observation_time = millis();
 }
 
 void initialize_motor_pins() {
@@ -47,7 +48,7 @@ void update_motor_control(uint16_t current_count, uint16_t& step_interval_counts
             current_velocity -= 0.0005f;
         }
 
-        step_interval_counts = (uint16_t)(40.f / current_velocity);
+        step_interval_counts = (uint16_t)(80.f / current_velocity); // 314
         
         last_control_count = current_count;
     }
