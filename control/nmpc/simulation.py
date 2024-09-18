@@ -121,8 +121,8 @@ class Simulation():
         def update_figure(i):
             x_lim_min = -0.8
             x_lim_max = 0.8
-            y_lim_min = -0.8
-            y_lim_max = 0.8
+            y_lim_min = -0.6
+            y_lim_max = 0.6
             u_scale = 50
 
             # set up the axes
@@ -184,4 +184,4 @@ if __name__ == "__main__":
 
     actual_state_trajectory, actual_control_trajectory, time_steps = simulation.simulate(current_state, [0, 5])
     # simulation.visualize_table(actual_state_trajectory, actual_control_trajectory, time_steps)
-    simulation.animate(actual_state_trajectory, actual_control_trajectory, time_steps, filename="./imgs/cart_pole.gif")
+    simulation.animate(actual_state_trajectory, actual_control_trajectory, time_steps, filename="cart_pole1.gif")
