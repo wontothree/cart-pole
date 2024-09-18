@@ -112,7 +112,7 @@ class Simulation():
         X = np.array(X)
         
         # animation setup
-        fig = plt.figure(figsize=(20, 20)) # size
+        fig = plt.figure(figsize=(20, 15)) # size
         ax = fig.add_subplot(111)
         frames = np.arange(0, t_eval.size) # frame numbers
         fps = 1 / self.cart_pole_nmpc.control_sampling_time
