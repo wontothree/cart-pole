@@ -144,7 +144,7 @@ class CartPoleNMPC(MPC):
 
         # solver options
         options = {
-            "print_time": True,
+            "print_time": False,
             "ipopt": {
                 "max_iter": 1000,
                 "print_level": 1
