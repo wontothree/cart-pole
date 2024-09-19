@@ -1,12 +1,15 @@
 import serial
 
-class UartReceiver:
-    def __init__(self, port1='COM5', baudrate1=38400, port2='COM8', baudrate2=9600, timeout=0.01):
+class Uart:
+    def __init__(self):
         # set serial port
-        # self.serial1 = serial.Serial(port1, baudrate1, timeout=timeout)
-        self.serial2 = serial.Serial(port2, baudrate2, timeout=timeout)
+        self.serial1 = serial.Serial(port='COM5', baudrate=38400, timeout=0.01)
+        self.serial2 = serial.Serial(port='COM8', baudrate=9600, timeout=0.01)
 
-        self.cart_previous_
+        self.STEPS_PER_METERS = 6366 # 6366.198
+
+        self.stepper_motor_previous_tick = 0
+        self.stepper_motor_previous_tick_observation_time = 0
 
     def receive_pole_angle_and_angular_velocity(self):
         # check if data is available in the buffer
@@ -19,35 +22,47 @@ class UartReceiver:
 
             return pole_angle, pole_angular_velocity
     
-    def receive_stepper_motor_tick_time(self):
+    def receive_stepper_motor_tick(self):
         if self.serial2.in_waiting > 0:
-            data = self.serial2.readline().decode('utf-8').strip()
-            data = data.split(',')
+            data = self.serial2.readline().strip()
+            data = data.split()
             stepper_motor_tick = float(data[0])
             stepper_motor_tick_observation_time = float(data[1])
 
+            return stepper_motor_tick, stepper_motor_tick_observation_time
 
-        
-    
+    def calculate_cart_position_and_velocity(self, stepper_motor_tick, stepper_motor_tick_observation_time):
+        if (stepper_motor_tick_observation_time - self.stepper_motor_previous_tick_observation_time):
+            cart_position = stepper_motor_tick / self.STEPS_PER_METERS # m
+            cart_velocity = ((stepper_motor_tick - self.stepper_motor_previous_tick) / self.STEPS_PER_METERS / ((stepper_motor_tick_observation_time - self.stepper_motor_previous_tick_observation_time) / 1000.0)) # m/s
+
+            self.stepper_motor_previous_tick = stepper_motor_tick
+            self.stepper_motor_previous_tick_observation_time = stepper_motor_tick_observation_time
+
+            return cart_position, cart_velocity
 
 if __name__ == "__main__":
-    uart_receiver = UartReceiver()
-
+    uart = Uart()
     try:
         while True:
-            # receive_uart_return = uart_receiver.receive_pole_angle_and_angular_velocity()
-            # if receive_uart_return is not None:
-            #     pole_angle, pole_angular_velocity = receive_uart_return
-            #     print(pole_angle, pole_angular_velocity)
-            
-            receive_stepper_motor_tick_return = uart_receiver.receive_stepper_motor_tick()
+            receive_pole_angle_and_angular_velocity_return = uart.receive_pole_angle_and_angular_velocity()            
+            if receive_pole_angle_and_angular_velocity_return is not None:
+                pole_angle, pole_angular_velocity = receive_pole_angle_and_angular_velocity_return
+
+                # print(pole_angle, pole_angular_velocity)
+
+            receive_stepper_motor_tick_return = uart.receive_stepper_motor_tick()
             if receive_stepper_motor_tick_return is not None:
-                print(receive_stepper_motor_tick_return)
+                stepper_motor_tick, stepper_motor_tick_observation_time = receive_stepper_motor_tick_return
+
+                cart_position, cart_velocity = uart.calculate_cart_position_and_velocity(stepper_motor_tick, stepper_motor_tick_observation_time)
+
+                # print(cart_position, cart_velocity)
 
     except serial.SerialException as e:
         print(f"SerialException: {e}")
     finally:
-        if uart_receiver.serial1.is_open:
-            uart_receiver.serial1.close()
-        if uart_receiver.serial2.is_open:
-            uart_receiver.serial2.close()
+        if uart.serial1.is_open:
+            uart.serial1.close()
+        if uart.serial2.is_open:
+            uart.serial2.close()

@@ -17,7 +17,7 @@ extern volatile int direction;                  // 1 : clockwise, -1 : counter-c
 extern volatile bool isDirectionChanged;
 extern volatile float target_velocity;
 
-extern volatile int16_t stepper_motor_tick;
-extern volatile unsigned long stepper_motor_tick_observation_time; 
+extern volatile uint16_t stepper_motor_tick;
+extern volatile uint16_t stepper_motor_tick_observation_time; 
 
 #endif // GLOBALS_HPP

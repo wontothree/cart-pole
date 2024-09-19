@@ -40,9 +40,9 @@
         }
     }
 
-    void send_uart_int(int16_t num) {
-        char buffer[6];                                 // -5000에서 5000까지의 숫자를 문자열로 표현하기 위한 버퍼
-        snprintf(buffer, sizeof(buffer), "%d", num);    // integer to string
+    void send_uart_int(uint16_t num) {                  // 0 ~ 65,535
+        char buffer[6];                                 // 5 자리
+        snprintf(buffer, sizeof(buffer), "%u", num);    // integer to string
         send_uart_string(buffer);                       // send string
     }
 
