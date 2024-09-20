@@ -8,17 +8,23 @@ void setup() {
 
   initialize_motor_pins();
 
-  initialize_timer1(64); // 64 분주
+  initialize_timer1(PRESCALER);
 
-  float current_velocity = 1;
-  uint16_t step_interval_counts = 80; // 8분주 : 314
+  float current_velocity = 0;
   uint16_t last_uart_update = 0;
+
+  uint16_t target_step_interval_counts = 80;
+  // uint16_t target_current_linear_acceleration = 0;
 
   while (true) {
     // clock count
     uint16_t current_count = get_timer1_count();
 
-    update_motor_control(current_count, step_interval_counts, current_velocity, target_velocity);
+    float target_velocity_copy = target_velocity;
+
+    // update_motor_control(current_count, step_interval_counts, current_velocity, target_velocity);
+
+    update_motor_control_by_accel(current_count, target_step_interval_counts, target_velocity_copy, target_velocity);
 
     handle_motor_direction();
 

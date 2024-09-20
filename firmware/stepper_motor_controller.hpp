@@ -17,7 +17,9 @@ void moveOneStep();
 
 void initialize_motor_pins();
 
-void update_motor_control(uint16_t current_count, uint16_t& step_interval_counts, float& current_velocity, float target_velocity);
+void update_motor_control(uint16_t current_count, uint16_t& step_interval_counts, float& current_linear_velocity, float target_velocity);
+
+void update_motor_control_by_accel(uint16_t current_count, uint16_t& target_step_interval_counts, float& current_linear_velocity, float target_current_linear_acceleration);
 
 void handle_motor_direction();
 

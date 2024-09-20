@@ -46,15 +46,27 @@
         send_uart_string(buffer);                       // send string
     }
 
+    // velocity
     // UART 수신 인터럽트 핸들러
     ISR(USART_RX_vect) {
         uint8_t receivedByte = UDR0;
         if ((receivedByte >= '0') && (receivedByte <= '9')) {
-            target_velocity = (receivedByte - '0') * 0.4f;
+            target_velocity = (receivedByte - '0'); // * 0.4f;
         } else if (receivedByte == ' ') { // 스페이스바 입력
             isDirectionChanged = true; // 방향 전환 플래그 설정
         }
     }
+
+    // // acceleration
+    // // UART 수신 인터럽트 핸들러
+    // ISR(USART_RX_vect) {
+    //     uint8_t receivedByte = UDR0;
+    //     if ((receivedByte >= '0') && (receivedByte <= '9')) {
+    //         target_current_linear_acceleration = (receivedByte - '0');
+    //     } else if (receivedByte == ' ') { // 스페이스바 입력
+    //         isDirectionChanged = true; // 방향 전환 플래그 설정
+    //     }
+    // }
 
     // UART 송신 인터럽트 핸들러
     ISR(USART_UDRE_vect) {
