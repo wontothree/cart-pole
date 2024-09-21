@@ -2,17 +2,16 @@
 #include "timer.hpp"
 
 // 1, 2 phase excitation method
-int step_info[8][4] = 
-{
-  { HIGH, LOW, LOW, LOW }, // one phase, 0.9 degree, or 1/400 revolution
-  { HIGH, HIGH, LOW, LOW },
-  { LOW, HIGH, LOW, LOW },
-  { LOW, HIGH, HIGH, LOW },
-  { LOW, LOW, HIGH, LOW },
-  { LOW, LOW, HIGH, HIGH },
-  { LOW, LOW, LOW, HIGH },
-  { HIGH, LOW, LOW, HIGH }
-};
+int step_info[8][4] =
+    {
+        {HIGH, LOW, LOW, LOW}, // one phase, 0.9 degree, or 1/400 revolution
+        {HIGH, HIGH, LOW, LOW},
+        {LOW, HIGH, LOW, LOW},
+        {LOW, HIGH, HIGH, LOW},
+        {LOW, LOW, HIGH, LOW},
+        {LOW, LOW, HIGH, HIGH},
+        {LOW, LOW, LOW, HIGH},
+        {HIGH, LOW, LOW, HIGH}};
 
 uint16_t lastMotorUpdateCount = getTimerCount();
 float currentMotorInterval = 625;
@@ -37,29 +36,30 @@ void initializeStepperMotorPins()
     pinMode(PIN_NB, OUTPUT);
 }
 #define MIN_INTERVAL 30
-#define TICK_PER_METER (6366.197)   // from 400 tick = 2 pi (0.01m)
-#define COUNT_PER_SECOND (250000)   // 16M / 64
+#define TICK_PER_METER (6366.197) // from 400 tick = 2 pi (0.01m)
+#define COUNT_PER_SECOND (250000) // 16M / 64
 
 void updateMotorByAcceleration(uint16_t currentCount, float acceleration)
 {
-    // move one step 
+    // move one step
     if (currentCount - lastMotorUpdateCount >= currentMotorInterval)
     {
         moveOneStep();
 
-        float newMotorInterval =  currentMotorInterval * 9817478.15847f / (9817478.15847f +  acceleration * currentMotorInterval * currentMotorInterval);
+        float newMotorInterval = currentMotorInterval * 9817478.15847f / (9817478.15847f + acceleration * currentMotorInterval * currentMotorInterval);
 
-        if (newMotorInterval < MIN_INTERVAL) newMotorInterval = MIN_INTERVAL;
+        if (newMotorInterval < MIN_INTERVAL)
+            newMotorInterval = MIN_INTERVAL;
 
         // Update position of cart (m) (when tick = 1)
         currentPosition += 1.0f / TICK_PER_METER;
 
         // Update velocity of cart (m/s)
         // (count/s) / (tick/m * count) = m/s (when tick = 1)
-        currentVelocity = COUNT_PER_SECOND / (TICK_PER_METER *  currentMotorInterval);
+        currentVelocity = COUNT_PER_SECOND / (TICK_PER_METER * currentMotorInterval);
 
         // update interval
-        currentMotorInterval =newMotorInterval;
+        currentMotorInterval = newMotorInterval;
 
         // update last motor update count
         lastMotorUpdateCount += currentMotorInterval;

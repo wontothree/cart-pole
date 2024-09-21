@@ -8,18 +8,20 @@ float currentVelocity = 0;
 
 float acceleration = 0.1;
 
-void setup() {
+void setup()
+{
   // initializeUart(9600);
   initializeStepperMotorPins();
   initializeTimer(64);
 
   // uart
-//  uint16_t lastUartUpdateCount = 0;
- // const uint16_t UART_UPDATE_INTERVAL = 10000; 
+  //  uint16_t lastUartUpdateCount = 0;
+  // const uint16_t UART_UPDATE_INTERVAL = 10000;
 
-  while (true) {
+  while (true)
+  {
     // clock count
-   
+
     uint16_t currentCount = getTimerCount();
     updateMotorByAcceleration(currentCount, acceleration);
 

@@ -8,24 +8,27 @@ unsigned long previous_time = 0;
 unsigned long current_time = 0;
 float angular_velocity = 0;
 
-void setup() {
-  // initialize USB Serial communication 
+void setup()
+{
+  // initialize USB Serial communication
   Serial.begin(38400);
   // initialize Serial1 communication
   Serial1.begin(38400);
 }
 
-void loop() {
+void loop()
+{
   static String inString = "";
 
   // is data in Serial1
-  while (Serial1.available()) { 
+  while (Serial1.available())
+  {
     // read input
     char encoder_data = Serial1.read();
 
-
-    if (encoder_data == '\n') {
-      //  parsing string 
+    if (encoder_data == '\n')
+    {
+      //  parsing string
       int index1 = inString.indexOf(',');
       int index2 = inString.indexOf(',', index1 + 1);
 
@@ -34,14 +37,15 @@ void loop() {
 
       current_time = millis();
 
-      if (current_time - previous_time > 0) {
+      if (current_time - previous_time > 0)
+      {
         angular_velocity = (current_angle - previous_angle) / ((current_time - previous_time) / 1000.0);
       }
 
       // print
-      Serial.print(current_angle, 1);  // 1 decimal place
+      Serial.print(current_angle, 1); // 1 decimal place
       Serial.print(", ");
-      Serial.print(angular_velocity, 2);  // 2 decimal places
+      Serial.print(angular_velocity, 2); // 2 decimal places
       Serial.print("\n");
 
       // update previous angle and time
@@ -50,7 +54,9 @@ void loop() {
 
       // initialize string
       inString = "";
-    } else {
+    }
+    else
+    {
       inString += encoder_data;
     }
   }

@@ -2,8 +2,8 @@
 #define STEPPER_HPP
 
 #include <stdint.h>
-#include <avr/interrupt.h>  // for `noInterrupts()` and `interrupts()`
-#include <Arduino.h>        // For digitalWrite and pinMode
+#include <avr/interrupt.h> // for `noInterrupts()` and `interrupts()`
+#include <Arduino.h>       // For digitalWrite and pinMode
 
 #include "globals.hpp"
 
