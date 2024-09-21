@@ -3,37 +3,37 @@
 #include "uart.hpp"
 #include "timer.hpp"
 
+float currentPosition = 0;
+float currentVelocity = 0;
+
+float acceleration = 0;
+uint16_t currentMotorInterval = 500;
+uint16_t lastMotorUpdateCount = 0;
+
 void setup() {
-  initializeUart(9600); 
-
+  initializeUart(9600);
   initializeStepperMotorPins();
-
   initializeTimer(64);
 
-  float current_velocity = 0;
-  uint16_t last_uart_update = 0;
-
-  uint16_t target_step_interval_counts = 80;
-  // uint16_t target_current_linear_acceleration = 0;
+  // uart
+  uint16_t lastUartUpdateCount = 0;
+  const uint16_t UART_UPDATE_INTERVAL = 10000; 
 
   while (true) {
     // clock count
-    uint16_t current_count = getTimerCount();
+    uint16_t currentCount = getTimerCount();
 
-    float target_velocity_copy = target_velocity;
-    update_motor_control_by_accel(current_count, target_step_interval_counts, target_velocity_copy, target_velocity);
+    updateMotorByAcceleration(currentCount, acceleration);
 
-    // handle_motor_direction();
-
-    // UART communication
-    if ((current_count - last_uart_update) > UART_UPDATE_INTERVAL) {
-        noInterrupts(); // UART 송신 중 인터럽트를 비활성화
-        send_uart_int(stepper_motor_tick);
+    // communication
+    if ((currentCount - lastUartUpdateCount) > UART_UPDATE_INTERVAL) {
+        noInterrupts();
+        send_uart_int(currentPosition);
         send_uart_char(', ');
-        send_uart_int(stepper_motor_tick_observation_time);
+        send_uart_int(currentVelocity);
         send_uart_char('\n');
-        interrupts(); // 인터럽트를 다시 활성화
-        last_uart_update = current_count;
+        interrupts();
+        lastUartUpdateCount = currentCount;
     }
   }
 }
