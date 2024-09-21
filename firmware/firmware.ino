@@ -4,11 +4,11 @@
 #include "timer.hpp"
 
 void setup() {
-  initialize_uart(9600); 
+  initializeUart(9600); 
 
-  initialize_motor_pins();
+  initializeStepperMotorPins();
 
-  initialize_timer1(PRESCALER);
+  initializeTimer(64);
 
   float current_velocity = 0;
   uint16_t last_uart_update = 0;
@@ -18,15 +18,12 @@ void setup() {
 
   while (true) {
     // clock count
-    uint16_t current_count = get_timer1_count();
+    uint16_t current_count = getTimerCount();
 
     float target_velocity_copy = target_velocity;
-
-    // update_motor_control(current_count, step_interval_counts, current_velocity, target_velocity);
-
     update_motor_control_by_accel(current_count, target_step_interval_counts, target_velocity_copy, target_velocity);
 
-    handle_motor_direction();
+    // handle_motor_direction();
 
     // UART communication
     if ((current_count - last_uart_update) > UART_UPDATE_INTERVAL) {
