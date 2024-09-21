@@ -39,21 +39,23 @@ void updateMotorByAcceleration(uint16_t currentCount, float acceleration)
     const float TICK_PER_METER = 6366.197;   // from 400 tick = 2 pi (0.01m)
     const float COUNT_PER_SECOND = 250000;   // 16M / 64
 
-    // Update motor interval based on acceleration
-    float newMotorInterval = (float) currentMotorInterval / (1 + acceleration * currentMotorInterval * TICK_PER_METER / COUNT_PER_SECOND);
-    currentMotorInterval = (uint16_t) newMotorInterval;
+    float newMotorInterval = (float) currentMotorInterval / (1.0f + acceleration * currentMotorInterval * TICK_PER_METER / COUNT_PER_SECOND);
 
     // move one step 
     if (currentCount - lastMotorUpdateCount >= currentMotorInterval)
     {
-        lastMotorUpdateCount += currentMotorInterval;
         moveOneStep();
 
         // Update position of cart (m) (when tick = 1)
-        currentPosition += 1 / TICK_PER_METER;
-
+        currentPosition += 1.0f / TICK_PER_METER;
         // Update velocity of cart (m/s)
         // (count/s) / (tick/m * count) = m/s (when tick = 1)
         currentVelocity = COUNT_PER_SECOND / (TICK_PER_METER * (float) currentMotorInterval);
+
+        // update interval
+        currentMotorInterval = (uint16_t) newMotorInterval;
+
+        // update last motor update count
+        lastMotorUpdateCount += currentMotorInterval;
     }
 }
