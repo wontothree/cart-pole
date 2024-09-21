@@ -5,6 +5,6 @@
 
 void initializeTimer(uint8_t prescaler);
 
-uint16_t getTimerCount();
+#define getTimerCount() ((uint16_t)TCNT1)
 
 #endif

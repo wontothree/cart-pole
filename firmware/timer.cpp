@@ -22,7 +22,3 @@ void initializeTimer(uint8_t prescaler) {
   // enable interrupts
   sei();
 }
-
-uint16_t getTimerCount() {
-  return (uint16_t)TCNT1;
-}
