@@ -1,4 +1,3 @@
-#include "globals.hpp"
 #include "stepper_motor_controller.hpp"
 #include "uart.hpp"
 #include "timer.hpp"
@@ -18,12 +17,15 @@ void setup()
   //  uint16_t lastUartUpdateCount = 0;
   // const uint16_t UART_UPDATE_INTERVAL = 10000;
 
+  float currentVelocity = 0;
+  float currentPosition = 0;
+
   while (true)
   {
     // clock count
 
     uint16_t currentCount = getTimerCount();
-    updateMotorByAcceleration(currentCount, acceleration);
+    updateMotorByAcceleration(currentCount, acceleration, &currentVelocity, &currentPosition);
 
     // // communication
     // if ((currentCount - lastUartUpdateCount) > UART_UPDATE_INTERVAL) {

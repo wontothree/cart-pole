@@ -1,11 +1,8 @@
-#ifndef UART_HPP
-#define UART_HPP
+#pragma once
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdio.h> // for sprintf
-
-#include "globals.hpp"
 
 void initializeUart(unsigned int baud);
 
@@ -24,5 +21,3 @@ extern volatile uint8_t tx_tail;
 
 // UART 송신 인터럽트 핸들러 선언
 ISR(USART_UDRE_vect);
-
-#endif // UART_HPP
