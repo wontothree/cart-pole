@@ -7,7 +7,7 @@
 #define METER_PER_STEP (6366.198)           // from 400 step = 2 pi (0.01 m), 1 m = 6366.198 step
 #define COUNT_PER_SECOND (250000)           // 16M / 64, second = count x 1/(16M/64)
 #define SI_ACCEL_TO_HW_ACCEL (10937500)     // SI unit for all unit - step, count
-#define LENGTH_CALIBRATION (61.0f / 68.75f) // 이론값과 실제 자로 잰 값의 보정치
+#define LENGTH_CALIBRATION (68.75f / 61.0f) // 이론값과 실제 자로 잰 값의 보정치
 
 #define PIN_A 10
 #define PIN_NA 11
@@ -68,7 +68,7 @@ void updateMotorByAcceleration(uint16_t currentCount, float acceleration, float 
             *currentVelocity = direction * COUNT_PER_SECOND / (METER_PER_STEP * currentMotorInterval);
 
             // update position of cart (m) (when step = 1)
-            *currentPosition += 1.0f * direction / METER_PER_STEP;
+            *currentPosition += 1.0f * direction * LENGTH_CALIBRATION / METER_PER_STEP;
 
             // update interval
             currentMotorInterval = nextMotorInterval;
@@ -98,6 +98,6 @@ void updateMotorByVelocity(uint16_t currentCount, float velocity, float *current
     {
         moveOneStep();
         lastMotorUpdateCount += currentMotorInterval;
-        *currentPosition += 1.0f * direction / METER_PER_STEP;
+        *currentPosition += 1.0f * LENGTH_CALIBRATION * direction / METER_PER_STEP;
     }
 }

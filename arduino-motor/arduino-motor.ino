@@ -24,9 +24,9 @@ void setup()
   currentPosition = 0;
 
   // Move to left
-  while (currentPosition > -0.05f)
+  while (currentPosition > -0.03f)
   {
-    updateMotorByVelocity(getTimerCount(), -0.1, &currentPosition);
+    updateMotorByVelocity(getTimerCount(), -0.02, &currentPosition);
   }
 
   // Second alignment
@@ -38,7 +38,7 @@ void setup()
   currentPosition = 0;
 
   // Move to home position
-  currentPosition = 0.61f;
+  currentPosition = 0.34f;
   while (currentPosition > 0)
   {
     updateMotorByVelocity(getTimerCount(), -0.05, &currentPosition);
