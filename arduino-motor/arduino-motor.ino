@@ -34,7 +34,7 @@ void setup()
     {
       if (byte == '\n' || byte == '\r')
       {
-        acceleration = sign * num * 0.01f;
+        acceleration = sign * num * 0.1f;
         // sprintf(buf, "Accel:%d/100\n", sign * num);
         // putString(buf);
         sign = 1;

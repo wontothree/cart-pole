@@ -1,5 +1,6 @@
 import serial
 import casadi
+import numpy as np
 
 from uart import Uart
 from cartpole_nmpc import CartPoleNMPC
@@ -9,21 +10,23 @@ if __name__ == "__main__":
     cartpole_nmpc = CartPoleNMPC()
     try:
         while True:
+            # print pole angle and angular velocity
             receive_pole_angle_and_angular_velocity_return = uart.receive_pole_angle_and_angular_velocity()            
             if receive_pole_angle_and_angular_velocity_return is not None:
                 uart.pole_angle, uart.pole_angular_velocity = receive_pole_angle_and_angular_velocity_return
-                # print(pole_angle, pole_angular_velocity)
+                # print(uart.pole_angle, uart.pole_angular_velocity)
 
-            receive_stepper_motor_tick_return = uart.receive_stepper_motor_tick()
-            if receive_stepper_motor_tick_return is not None:
-                stepper_motor_tick, stepper_motor_tick_observation_time = receive_stepper_motor_tick_return
+            receive_cart_position_and_velocity_return = uart.receive_cart_position_and_velocity()
+            if receive_cart_position_and_velocity_return is not None:
+                uart.cart_position, uart.cart_velocity = receive_cart_position_and_velocity_return
+                # print(uart.position, uart.velocity)
 
-                uart.cart_position, uart.cart_velocity = uart.calculate_cart_position_and_velocity(stepper_motor_tick, stepper_motor_tick_observation_time)
-                # print(cart_position, cart_velocity)
+            # current_state = casadi.DM([uart.cart_position, uart.pole_angle, uart.cart_velocity, uart.pole_angular_velocity])
 
-            current_state = casadi.DM([uart.cart_position, uart.pole_angle, uart.cart_velocity, uart.pole_angular_velocity])
+            current_state = casadi.DM([0, uart.pole_angle, 0, uart.pole_angular_velocity])
             # print(current_state)
 
+            # set target state and target action
             cartpole_nmpc.set_target_state(casadi.DM([0, 0, 0, 0]))
             cartpole_nmpc.set_target_control(casadi.DM([0]))
 
