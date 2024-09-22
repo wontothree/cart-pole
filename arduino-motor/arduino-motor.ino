@@ -13,6 +13,38 @@ void setup()
   float currentVelocity = 0;
   float currentPosition = 0;
 
+  pinMode(A0, INPUT);
+
+  // First alignment
+  while (analogRead(A0) < 100)
+  {
+    updateMotorByVelocity(getTimerCount(), 0.1, &currentPosition);
+  }
+  updateMotorByVelocity(getTimerCount(), 0, &currentPosition);
+  currentPosition = 0;
+
+  // Move to left
+  while (currentPosition > -0.05f)
+  {
+    updateMotorByVelocity(getTimerCount(), -0.1, &currentPosition);
+  }
+
+  // Second alignment
+  while (analogRead(A0) < 100)
+  {
+    updateMotorByVelocity(getTimerCount(), 0.01, &currentPosition);
+  }
+  updateMotorByVelocity(getTimerCount(), 0, &currentPosition);
+  currentPosition = 0;
+
+  // Move to home position
+  currentPosition = 0.61f;
+  while (currentPosition > 0)
+  {
+    updateMotorByVelocity(getTimerCount(), -0.05, &currentPosition);
+  }
+  updateMotorByVelocity(getTimerCount(), 0, &currentPosition);
+
   uint16_t loggingInterval = 2500;
   uint16_t lastLogging = 0;
 

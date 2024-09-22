@@ -15,3 +15,4 @@ void initializeStepperMotorPins();
  * 주의: 현재 위치는 내부적으로 tracking하지 않으며, 외부에서 공급된 값에 변화만을 가한다.
  */
 void updateMotorByAcceleration(uint16_t currentCounter, float acceleration, float *currentVelocity, float *currentPosition);
+void updateMotorByVelocity(uint16_t currentCount, float velocity, float *currentPosition);
