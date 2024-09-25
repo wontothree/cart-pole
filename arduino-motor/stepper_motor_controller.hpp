@@ -6,6 +6,7 @@
 
 // pin map
 void initializeStepperMotorPins();
+void finalizeStepperMotorPins();
 
 /*
  * 모터를 가속도에 따라 제어하고, 현재 속도와 틱을 업데이트한다.

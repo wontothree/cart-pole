@@ -45,12 +45,12 @@ class Uart:
     def send_current_optimal_action(self, current_optimal_action):
         INVERSE_SUM_MASS = 4.7
         
-        current_optimal_acceleration = str(INVERSE_SUM_MASS * current_optimal_action)
+        current_optimal_acceleration = str(int(INVERSE_SUM_MASS * current_optimal_action * 100))
 
         current_optimal_acceleration += '\n'
 
         # for _ in range(10):
-        uart.serial2.write(current_optimal_acceleration.encode())
+        self.serial2.write(current_optimal_acceleration.encode())
 
     def send_acceleration(self):
         acceleration = input("가속도를 입력하세요: ")

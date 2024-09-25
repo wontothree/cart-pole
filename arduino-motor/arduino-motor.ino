@@ -66,7 +66,7 @@ void setup()
     {
       if (byte == '\n' || byte == '\r')
       {
-        acceleration = sign * num * 0.1f;
+        acceleration = sign * num * 0.01f;
         // sprintf(buf, "Accel:%d/100\n", sign * num);
         // putString(buf);
         sign = 1;
@@ -93,11 +93,12 @@ void setup()
         putByte('-');
         tmp *= -1;
       }
-      while (tmp)
+      do
       {
         putByte('0' + tmp % 10);
         tmp /= 10;
-      }
+      } while (tmp);
+
       putByte('P');
       tmp = currentPosition * 10000;
       if (tmp < 0)
@@ -105,11 +106,11 @@ void setup()
         putByte('-');
         tmp *= -1;
       }
-      while (tmp)
+      do
       {
         putByte('0' + tmp % 10);
         tmp /= 10;
-      }
+      } while (tmp);
 
       putByte('\n');
 
@@ -117,5 +118,13 @@ void setup()
     }
 
     processUart();
+
+    // safe for test
+    if (currentPosition < -0.34 || currentPosition > 0.34)
+      break;
   }
+
+  finalizeStepperMotorPins();
+  while (1)
+    ;
 }

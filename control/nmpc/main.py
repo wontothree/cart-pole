@@ -19,12 +19,12 @@ if __name__ == "__main__":
             receive_cart_position_and_velocity_return = uart.receive_cart_position_and_velocity()
             if receive_cart_position_and_velocity_return is not None:
                 uart.cart_position, uart.cart_velocity = receive_cart_position_and_velocity_return
-                # print(uart.position, uart.velocity)
+                print(uart.position, uart.velocity)
 
-            # current_state = casadi.DM([uart.cart_position, uart.pole_angle, uart.cart_velocity, uart.pole_angular_velocity])
+            current_state = casadi.DM([uart.cart_position, uart.pole_angle, uart.cart_velocity, uart.pole_angular_velocity])
 
-            current_state = casadi.DM([0, uart.pole_angle, 0, uart.pole_angular_velocity])
-            # print(current_state)
+            current_state = casadi.DM([uart.cart_position, uart.pole_angle, uart.cart_velocity, uart.pole_angular_velocity])
+            print(current_state)
 
             # set target state and target action
             cartpole_nmpc.set_target_state(casadi.DM([0, 0, 0, 0]))
@@ -33,10 +33,10 @@ if __name__ == "__main__":
             optimal_state_trajectory, optimal_control_trajectory = cartpole_nmpc.solve(current_state)
             current_optimal_action = optimal_control_trajectory[0]
 
-            print(current_optimal_action)
+            # print(current_optimal_action)
 
-            uart.send_current_optimal_action(current_optimal_action)
-
+            # uart.send_current_optimal_action(current_optimal_action)
+            
     except serial.SerialException as e:
         print(f"SerialException: {e}")
     finally:

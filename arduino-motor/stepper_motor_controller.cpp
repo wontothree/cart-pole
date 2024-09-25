@@ -50,6 +50,14 @@ void initializeStepperMotorPins()
     pinMode(PIN_NB, OUTPUT);
 }
 
+void finalizeStepperMotorPins()
+{
+    digitalWrite(PIN_A, LOW);
+    digitalWrite(PIN_B, LOW);
+    digitalWrite(PIN_NA, LOW);
+    digitalWrite(PIN_NB, LOW);
+}
+
 void updateMotorByAcceleration(uint16_t currentCount, float acceleration, float *currentVelocity, float *currentPosition)
 {
     if (abs(currentMotorInterval) < 10000)
