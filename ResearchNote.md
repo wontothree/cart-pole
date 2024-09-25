@@ -1,6 +1,6 @@
 # Research Note
 
-2024.09.25
+*2024.09.25*
 
 I shoud start with balancing using only the Arduino without any external communication. I shoud not try to do too much at once. I need to take it step by step.
 
@@ -67,19 +67,26 @@ float controlByPID()
 
 void loop()
 {
-    float interval = constant * controlByPID();
+    float acceleration = controlByPID(); 
+
+    float maxAcceleration = 10.0; 
+    float minAcceleration = -10.0;
 
     // limit max and min
-    if (interval < constant) {
-        interval = constant;
-    } else if (interval > constant) {
-        interval = constant;
+    if (interval > maxAcceleration) {
+        interval = maxAcceleration;
+    } else if (interval < minAcceleration) {
+        interval = minAcceleration;
     }
 
-    if (angleError > 0) {
-        // move right
-    } else if (angleError < 0) {
-        // move left
-    }
+    // motor control
+
+    // if (angleError > 0) {
+    //     // move right
+    // } else if (angleError < 0) {
+    //     // move left
+    // }
 }
 ```
+
+What shoud this pid controller return? velocity or acceleration? I think that is acceleration. Tho it's suspicious.
