@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "pico/stdio_usb.h"
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
@@ -16,6 +17,8 @@
 #define UART_TX_PIN 0
 #define UART_RX_PIN 1
 
+#define BUFFER_SIZE 100
+
 volatile float acceleration = 0.0f; // Revolutions per second squared
 volatile float velocity = 0;        // Revolutions per second
 volatile uint32_t position = 0;     // Steps
@@ -23,16 +26,65 @@ volatile uint32_t position = 0;     // Steps
 /**
  * UART RX test IRQ Handler
  */
-// static int chars_rxed = 0;
-// void on_uart_rx()
-// {
-//     while (uart_is_readable(UART_ID))
-//     {
-//         uint8_t ch = uart_getc(UART_ID);
-//         printf("%c.", ch);
-//         chars_rxed++;
-//     }
-// }
+
+// uart 입력이 들어올 때마다 자동으로 호출되는 함수
+// IRQ handler
+
+/*
+ *
+ */
+void uart_callback()
+{
+    while (uart_is_readable(UART_ID))
+    {
+        static uint8_t ch;
+        ch = uart_getc(UART_ID);
+        static char buffer[BUFFER_SIZE];
+        static int index = 0;
+
+        buffer[index++] = ch;
+
+        if (ch == '\n')
+        {
+            buffer[index] = '\0';
+
+            // select the second - angle
+            if (strncmp(buffer, "$ANG", 4) == 0)
+            {
+                int comma_count = 0;
+                int second_value_start = 0;
+
+                for (int i = 0; buffer[i] != '\0'; i++)
+                {
+                    if (buffer[i] == ',')
+                    {
+                        comma_count++;
+                        if (comma_count == 1)
+                        {
+                            second_value_start = i + 1;
+                            break;
+                        }
+                    }
+                }
+                // find index of the second
+                int second_value_end = second_value_start;
+                while (buffer[second_value_end] != ',' && buffer[second_value_end] != '\0')
+                {
+                    second_value_end++;
+                }
+
+                // obtain the second
+                char second_value_str[BUFFER_SIZE];
+                strncpy(second_value_str, buffer + second_value_start, second_value_end - second_value_start);
+                second_value_str[second_value_end - second_value_start] = '\0';
+
+                printf("Angle of Pole: %s\n", second_value_str);
+            }
+
+            index = 0;
+        }
+    }
+}
 
 /**
  * Core 0 is responsible for acceleration control
@@ -51,84 +103,19 @@ void core0_main()
     uart_init(UART_ID, BAUD_RATE);
     gpio_set_function(UART_TX_PIN, UART_FUNCSEL_NUM(UART_ID, UART_TX_PIN));
     gpio_set_function(UART_RX_PIN, UART_FUNCSEL_NUM(UART_ID, UART_RX_PIN));
-    // uart_set_baudrate(UART_ID, BAUD_RATE);
-    // uart_set_hw_flow(UART_ID, false, false);
-    // uart_set_fifo_enabled(UART_ID, false);
-
-    // print encoder data
-    stdio_init_all();
-
-    char buffer[BUFFER_SIZE];
-    int index = 0;
-
-    // Mocking UART data input for demonstration
-    const char *mock_uart_data = "$ANG,152.3 ,11.644,110\r\n";
-
-    while (1)
-    {
-        // Simulating receiving data
-        for (int i = 0; mock_uart_data[i] != '\0'; i++)
-        {
-            char ch = mock_uart_data[i];
-            if (ch == '\n')
-            {
-                buffer[index] = '\0'; // Null-terminate the string
-
-                // Parsing logic
-                if (strncmp(buffer, "$ANG", 4) == 0)
-                { // Check if the string starts with "$ANG"
-                    int index1 = 0;
-                    int index2 = 0;
-
-                    // Find the first comma
-                    while (buffer[index1] != ',' && buffer[index1] != '\0')
-                    {
-                        index1++;
-                    }
-
-                    // Find the second comma
-                    index2 = index1 + 1;
-                    while (buffer[index2] != ',' && buffer[index2] != '\0')
-                    {
-                        index2++;
-                    }
-
-                    // Extract and convert the angle
-                    if (index1 < index2)
-                    {
-                        char angle_str[BUFFER_SIZE];
-                        strncpy(angle_str, buffer + index1 + 1, index2 - index1 - 1);
-                        angle_str[index2 - index1 - 1] = '\0'; // Null-terminate the angle string
-
-                        float current_angle = atof(angle_str); // Convert string to float
-                        printf("Current Angle: %f\n", current_angle);
-                    }
-                }
-
-                index = 0; // Reset index for the next string
-            }
-            else
-            {
-                buffer[index++] = ch;
-                if (index >= BUFFER_SIZE - 1)
-                { // Ensure buffer doesn't overflow
-                    index = BUFFER_SIZE - 1;
-                }
-            }
-        }
-
-        sleep_ms(1000); // Wait before next iteration
-    }
 
     // ,,,
-    // uart_set_hw_flow(UART_ID, false, false);
-    // uart_set_fifo_enabled(UART_ID, false);
-    // int UART_IRQ = UART_ID == uart0 ? UART0_IRQ : UART1_IRQ;
-    // irq_set_exclusive_handler(UART_IRQ, on_uart_rx);
-    // irq_set_enabled(UART_IRQ, true);
-    // uart_set_irq_enables(UART_ID, true, false);
+    uart_set_hw_flow(UART_ID, false, false);
+    uart_set_fifo_enabled(UART_ID, false);
+    int UART_IRQ = UART_ID == uart0 ? UART0_IRQ : UART1_IRQ;
+
+    irq_set_exclusive_handler(UART_IRQ, uart_callback); // UART IRQ handler 등록
+    irq_set_enabled(UART_IRQ, true);                    // UART IRQ 라인 활성화
+    uart_set_irq_enables(UART_ID, true, false);         // UART RX IRQ 활성화, UART TX IRQ 비활성화
     printf("UART initialized\n");
 
+    // while (1)
+    //     ;
     // Acceleration control variables
     int32_t sign = 1;
     int32_t acceleration_buffer = 0;
