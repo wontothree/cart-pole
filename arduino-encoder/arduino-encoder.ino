@@ -1,6 +1,5 @@
-// 주의사항
-// 전압이 부족하면 센서가 다운되기 때문에 아두이노 전원은 아답터로 연결해야 한다.
-// RX핀이 업로드를 방해할 수 있기 때문에 코드 업로드 시 아두이노 RX 핀을 연결하지 않고 업로드 완료 후 RX 핀을 연결해야 한다.
+#define PI 3.141592
+#define RADIAN_PER_DEGREE 0.0174533
 
 float previous_angle = 0;
 float current_angle = 0;
@@ -35,17 +34,24 @@ void loop()
       // remove label and parse data
       float current_angle = inString.substring(index1 + 1, index2).toFloat();
 
+      // degree to radian
+      current_angle *= RADIAN_PER_DEGREE;
+
+      // 0 ~ 2pi to -pi ~ pi
+      current_angle -= PI;
+
       current_time = millis();
 
+      // calculate angular velocity
       if (current_time - previous_time > 0)
       {
         angular_velocity = (current_angle - previous_angle) / ((current_time - previous_time) / 1000.0);
       }
 
       // print
-      Serial.print(current_angle, 1); // 1 decimal place
+      Serial.print(current_angle, 3); // 3 decimal place
       Serial.print(", ");
-      Serial.print(angular_velocity, 2); // 2 decimal places
+      Serial.print(angular_velocity, 3); // 3 decimal places
       Serial.print("\n");
 
       // update previous angle and time

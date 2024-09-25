@@ -4,14 +4,17 @@
 #include <Arduino.h>       // for digitalWrite and pinMode
 
 #define MIN_INTERVAL (30)
-#define TICK_PER_METER (6366.197)             // from 400 tick = 2 pi (0.01m)
-#define COUNT_PER_SECOND (250000)             // 16M / 64
-#define SI_ACCEL_TO_HW_ACCEL (9817478.15847f) // m/s^2 을 step/tick^2으로 변환한다. 구체적으로는 COUNT_PER_SECOND^2/TICK_PER_METER 이다.
+#define METER_PER_STEP (6366.198)           // from 400 step = 2 pi (0.01 m), 1 m = 6366.198 step
+#define COUNT_PER_SECOND (250000)           // 16M / 64, second = count x 1/(16M/64)
+#define SI_ACCEL_TO_HW_ACCEL (10937500)     // SI unit for all unit - step, count
+#define LENGTH_CALIBRATION (68.75f / 61.0f) // 이론값과 실제 자로 잰 값의 보정치
 
 #define PIN_A 10
 #define PIN_NA 11
 #define PIN_B 12
 #define PIN_NB 13
+
+#define sign(x) (((x) > 0) ? 1 : -1)
 
 // 1, 2 phase excitation method
 int step_info[8][4] = {{HIGH, LOW, LOW, LOW}, // one phase, 0.9 degree, or 1/400 revolution
@@ -25,7 +28,7 @@ int step_info[8][4] = {{HIGH, LOW, LOW, LOW}, // one phase, 0.9 degree, or 1/400
 
 static int direction = 1;
 static uint16_t lastMotorUpdateCount = getTimerCount();
-static float currentMotorInterval = 625; // 초당 1바퀴를 돌도록 설정
+static float currentMotorInterval = 65537; // 초당 1바퀴를 돌도록 설정
 
 // rotate one phase (0.9 degree)
 static inline void moveOneStep()
@@ -49,10 +52,52 @@ void initializeStepperMotorPins()
 
 void updateMotorByAcceleration(uint16_t currentCount, float acceleration, float *currentVelocity, float *currentPosition)
 {
-    // move one step
+    if (abs(currentMotorInterval) < 10000)
+    {
+        if (currentCount - lastMotorUpdateCount >= currentMotorInterval)
+        {
+            moveOneStep();
+
+            float nextMotorInterval = currentMotorInterval * SI_ACCEL_TO_HW_ACCEL / (SI_ACCEL_TO_HW_ACCEL + direction * acceleration * currentMotorInterval * currentMotorInterval);
+
+            // if (nextMotorInterval < MIN_INTERVAL)
+            //     nextMotorInterval = MIN_INTERVAL;
+
+            // update velocity of cart (m/s)
+            // (count/s) / (tick/m * count) = m/s (when step = 1)
+            *currentVelocity = direction * COUNT_PER_SECOND / (METER_PER_STEP * currentMotorInterval);
+
+            // update position of cart (m) (when step = 1)
+            *currentPosition += 1.0f * direction * LENGTH_CALIBRATION / METER_PER_STEP;
+
+            // update interval
+            currentMotorInterval = nextMotorInterval;
+
+            // update last motor update count
+            lastMotorUpdateCount += currentMotorInterval;
+        }
+    }
+    else
+    {
+        if (currentCount - lastMotorUpdateCount >= 100)
+        {
+            lastMotorUpdateCount += 100;
+
+            *currentVelocity += acceleration * 100 / COUNT_PER_SECOND;
+            direction = sign(*currentVelocity);
+            currentMotorInterval = direction * COUNT_PER_SECOND / (METER_PER_STEP * *currentVelocity);
+        }
+    }
+}
+
+void updateMotorByVelocity(uint16_t currentCount, float velocity, float *currentPosition)
+{
+    direction = sign(velocity);
+    float currentMotorInterval = direction * COUNT_PER_SECOND / (METER_PER_STEP * velocity);
     if (currentCount - lastMotorUpdateCount >= currentMotorInterval)
     {
         moveOneStep();
+<<<<<<< HEAD
 
         float newMotorInterval = currentMotorInterval * SI_ACCEL_TO_HW_ACCEL / (SI_ACCEL_TO_HW_ACCEL + acceleration * currentMotorInterval * currentMotorInterval);
 
@@ -70,6 +115,9 @@ void updateMotorByAcceleration(uint16_t currentCount, float acceleration, float 
         currentMotorInterval = newMotorInterval;
 
         // update last motor update count
+=======
+>>>>>>> e31261722b5b5b4bf62e4a4f2def918307fed6a9
         lastMotorUpdateCount += currentMotorInterval;
+        *currentPosition += 1.0f * LENGTH_CALIBRATION * direction / METER_PER_STEP;
     }
 }

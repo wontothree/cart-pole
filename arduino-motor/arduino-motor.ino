@@ -13,6 +13,38 @@ void setup()
   float currentVelocity = 0;
   float currentPosition = 0;
 
+  pinMode(A0, INPUT);
+
+  // First alignment
+  while (analogRead(A0) < 100)
+  {
+    updateMotorByVelocity(getTimerCount(), 0.1, &currentPosition);
+  }
+  updateMotorByVelocity(getTimerCount(), 0, &currentPosition);
+  currentPosition = 0;
+
+  // Move to left
+  while (currentPosition > -0.03f)
+  {
+    updateMotorByVelocity(getTimerCount(), -0.02, &currentPosition);
+  }
+
+  // Second alignment
+  while (analogRead(A0) < 100)
+  {
+    updateMotorByVelocity(getTimerCount(), 0.01, &currentPosition);
+  }
+  updateMotorByVelocity(getTimerCount(), 0, &currentPosition);
+  currentPosition = 0;
+
+  // Move to home position
+  currentPosition = 0.34f;
+  while (currentPosition > 0)
+  {
+    updateMotorByVelocity(getTimerCount(), -0.05, &currentPosition);
+  }
+  updateMotorByVelocity(getTimerCount(), 0, &currentPosition);
+
   uint16_t loggingInterval = 2500;
   uint16_t lastLogging = 0;
 
@@ -34,7 +66,7 @@ void setup()
     {
       if (byte == '\n' || byte == '\r')
       {
-        acceleration = sign * num * 0.01f;
+        acceleration = sign * num * 0.1f;
         // sprintf(buf, "Accel:%d/100\n", sign * num);
         // putString(buf);
         sign = 1;
