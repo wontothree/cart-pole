@@ -6,12 +6,53 @@ I shoud start with balancing using only the Arduino without any external communi
 
 I realized I can never apply nonlinear model predictive control algorithm to my completed cart pole system although i have achieved the algorithm in simulation environment. I decide to test step by step from most simple balancing algorithm in my hardware.
 
-p controller using only angle of pole obtained from absolute rotary encoder. sudo code is like
+P controller using only angle of pole obtained from absolute rotary encoder. sudo code is like
 
 ```cpp
 if (angle > 0 ) { // clockwise is positive
     // move right as constant velocity
-} else (angle <0) {
+} else (angle < 0) {
     // move left as constant velocity
+}
+```
+
+PID controller
+
+```cpp
+// parametric gain constant
+float kp, ki, kd;
+float cumulativeAngleError;
+float lastAngleError;
+
+// proportional
+float angleError = abs(angle - targetAngle);
+
+float currentTime = millis();
+
+float timeInterval = currentTime - lastTime;
+
+// integral
+float cumulativeAngleError = angleError * timeInterval;
+
+// derivative
+float derivativeAngleError = (angleError - lastAngleError) / timeInterval;
+
+// output of pid
+float output = kp * angleError + ki * cumulativeAngleError + kd * derivativeAngleError;
+
+// update last values
+lastAngleError = angleError;
+lastTime = currentTime;
+
+// set parametric constant of pid controller
+void setConstantPID(float KP, float KI, float KD) {
+    // proportional constant
+    kp = KP;
+
+    // integral constant
+    ki = KI;
+
+    // derivative constant
+    kd = KD;
 }
 ```
