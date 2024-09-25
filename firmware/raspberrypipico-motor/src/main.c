@@ -9,6 +9,8 @@
 #include "hardware/irq.h"
 #include "math.h"
 
+#include "pid.h"
+
 #define abs(x) ((x) < 0 ? -(x) : (x))
 
 // UART configuration
@@ -29,10 +31,6 @@ volatile uint32_t position = 0;     // Steps
 
 // uart 입력이 들어올 때마다 자동으로 호출되는 함수
 // IRQ handler
-
-/*
- *
- */
 void uart_callback()
 {
     while (uart_is_readable(UART_ID))
@@ -114,8 +112,6 @@ void core0_main()
     uart_set_irq_enables(UART_ID, true, false);         // UART RX IRQ 활성화, UART TX IRQ 비활성화
     printf("UART initialized\n");
 
-    // while (1)
-    //     ;
     // Acceleration control variables
     int32_t sign = 1;
     int32_t acceleration_buffer = 0;
@@ -210,6 +206,12 @@ void core0_main()
             velocity = 0;
             acceleration = 0;
         }
+
+        if (position < -1900)
+        {
+            velocity = 0;
+            acceleration = 0;
+        }
     }
 }
 
@@ -274,13 +276,23 @@ void core1_main()
             }
         }
 
-        // Update velocity every 1ms
+        // // Update velocity every 1ms
         time_us = time_us_64();
         if (time_us - last_update_time >= update_interval)
         {
             velocity += acceleration * (time_us - last_update_time) / 1000000.0f;
             last_update_time += update_interval;
         }
+
+        // Update velocity using PID controller
+        // if (time_us - last_update_time >= update_interval)
+        // {
+        //     setPID(1.0, 0, 0);
+
+        //     setTargetAngle(0);
+
+        //     // float acceleration = controlByPID(angle);
+        // }
 
         // Limit the step holding time to max_interval
         if (time_us - time_last_us > max_interval)
@@ -293,7 +305,7 @@ void core1_main()
     }
 }
 
-/**
+/*
  * Entrypoint
  */
 int main()

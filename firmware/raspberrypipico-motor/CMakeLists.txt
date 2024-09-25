@@ -11,6 +11,7 @@ set(INC_DIR ${SRC_DIR})
 file(GLOB SOURCE_PICO ${SRC_DIR}/pico/*.c)
 set(SOURCES
     ${SRC_DIR}/main.c
+    ${SRC_DIR}/pid.c
     ${SOURCE_PICO}
 )
 
