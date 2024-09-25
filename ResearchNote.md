@@ -16,36 +16,18 @@ if (angle > 0 ) { // clockwise is positive
 }
 ```
 
-PID controller
+PID controller giving velocity of cart
 
 ```cpp
 // parametric gain constant
+float angleError;
 float kp, ki, kd;
 float cumulativeAngleError;
 float lastAngleError;
 
-// proportional
-float angleError = abs(angle - targetAngle);
-
-float currentTime = millis();
-
-float timeInterval = currentTime - lastTime;
-
-// integral
-float cumulativeAngleError = angleError * timeInterval;
-
-// derivative
-float derivativeAngleError = (angleError - lastAngleError) / timeInterval;
-
-// output of pid
-float output = kp * angleError + ki * cumulativeAngleError + kd * derivativeAngleError;
-
-// update last values
-lastAngleError = angleError;
-lastTime = currentTime;
-
 // set parametric constant of pid controller
-void setConstantPID(float KP, float KI, float KD) {
+void setPID(float KP, float KI, float KD) 
+{
     // proportional constant
     kp = KP;
 
@@ -54,5 +36,48 @@ void setConstantPID(float KP, float KI, float KD) {
 
     // derivative constant
     kd = KD;
+}
+
+float controlByPID()
+{
+    // proportional
+    angleError = abs(angle - targetAngle);
+
+    float currentTime = millis();
+
+    float timeInterval = currentTime - lastTime;
+
+    // integral
+    float cumulativeAngleError = angleError * timeInterval;
+
+    // derivative
+    float derivativeAngleError = (angleError - lastAngleError) / timeInterval;
+
+    // output of pid
+    float output = kp * angleError + ki * cumulativeAngleError + kd * derivativeAngleError;
+
+    // update last values
+    lastAngleError = angleError;
+    lastTime = currentTime;
+
+    return output
+}
+
+void loop()
+{
+    float interval = constant * controlByPID();
+
+    // limit max and min
+    if (interval < constant) {
+        interval = constant;
+    } else if (interval > constant) {
+        interval = constant;
+    }
+
+    if (angleError > 0) {
+        // move right
+    } else if (angleError < 0) {
+        // move left
+    }
 }
 ```

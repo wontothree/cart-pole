@@ -105,8 +105,6 @@ void updateMotorByVelocity(uint16_t currentCount, float velocity, float *current
     if (currentCount - lastMotorUpdateCount >= currentMotorInterval)
     {
         moveOneStep();
-<<<<<<< HEAD
-<<<<<<< HEAD
 
         float newMotorInterval = currentMotorInterval * SI_ACCEL_TO_HW_ACCEL / (SI_ACCEL_TO_HW_ACCEL + acceleration * currentMotorInterval * currentMotorInterval);
 
@@ -124,10 +122,6 @@ void updateMotorByVelocity(uint16_t currentCount, float velocity, float *current
         currentMotorInterval = newMotorInterval;
 
         // update last motor update count
-=======
->>>>>>> e31261722b5b5b4bf62e4a4f2def918307fed6a9
-=======
->>>>>>> e31261722b5b5b4bf62e4a4f2def918307fed6a9
         lastMotorUpdateCount += currentMotorInterval;
         *currentPosition += 1.0f * LENGTH_CALIBRATION * direction / METER_PER_STEP;
     }
