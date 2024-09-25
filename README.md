@@ -12,6 +12,10 @@
 - length of rail (linear guide) : 0.72m (72cm)
 - maximum magnitude of force : 1.2 N
 
-# Block Diagram
+# Getting Started
 
-![block-diagram](https://github.com/user-attachments/assets/8c8b2d22-6f9f-4e63-b53d-9e3768450cb8)
+# Research Note
+
+2024.09.25
+
+I shoud start with balancing using only the Arduino without any external communication. I shoud not try to do too much at once. I need to take it step by step.

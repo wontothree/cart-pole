@@ -1,7 +1,7 @@
 #include "stepper_motor_controller.hpp"
 #include "timer.hpp"
 #include <avr/interrupt.h> // for `noInterrupts()` and `interrupts()`
-#include <Arduino.h>       // For digitalWrite and pinMode
+#include <Arduino.h>       // for digitalWrite and pinMode
 
 #define MIN_INTERVAL (30)
 #define TICK_PER_METER (6366.197)             // from 400 tick = 2 pi (0.01m)
@@ -59,10 +59,10 @@ void updateMotorByAcceleration(uint16_t currentCount, float acceleration, float 
         if (newMotorInterval < MIN_INTERVAL)
             newMotorInterval = MIN_INTERVAL;
 
-        // Update position of cart (m) (when tick = 1)
+        // update position of cart (m) (when tick = 1)
         *currentPosition += 1.0f / TICK_PER_METER;
 
-        // Update velocity of cart (m/s)
+        // update velocity of cart (m/s)
         // (count/s) / (tick/m * count) = m/s (when tick = 1)
         *currentVelocity = COUNT_PER_SECOND / (TICK_PER_METER * currentMotorInterval);
 

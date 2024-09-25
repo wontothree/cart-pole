@@ -32,6 +32,10 @@ class CartPoleNMPC(MPC):
         self.total_variables = (self.prediction_horizon + 1) * self.state_dim + self.prediction_horizon * self.control_dim
 
     def define_dynamic_model(self):
+        '''
+        discrete time state space model
+        '''
+
         # constant parameter
         g = self.gravity
         M = self.cart_mass
@@ -51,15 +55,16 @@ class CartPoleNMPC(MPC):
         cos = casadi.cos(theta)
         common = M + m * sin**2
 
-        # dynamics
+        # continuous dynamics
         x_ddot = (m * g * sin * cos - m * L / 2 * sin * theta_dot**2 + F) / common
         theta_ddot = (- m * L / 2 * sin * cos * theta_dot**2 + (M + m) * g * sin + F * cos) / (L / 2 * common)
 
+        # derivation of state
         states_dot = casadi.vertcat(x_dot, theta_dot, x_ddot, theta_ddot)
 
         continuous_dynamic_model = casadi.Function("f", [self.state, self.control], [states_dot], ['x', 'u'], ['x_dot'])
 
-        # discretize
+        # discretize by Runge-Kutta 4
         r1 = continuous_dynamic_model(x=self.state, u=self.control)["x_dot"]
         r2 = continuous_dynamic_model(x=self.state + self.control_sampling_time * r1 / 2, u=self.control)["x_dot"]
         r3 = continuous_dynamic_model(x=self.state + self.control_sampling_time * r2 / 2, u=self.control)["x_dot"]
@@ -72,6 +77,11 @@ class CartPoleNMPC(MPC):
         return discretized_dynamic_model
     
     def define_constraint(self, state_trajectory, control_trajectory, current_state):
+        '''
+        - equality constraint by dynamic model
+        - inequality constraint
+        '''
+
         discretized_dynamic_model = self.define_dynamic_model()
         # equality constraint
         equality_constraint_lower_bound = [0] * (self.prediction_horizon * self.state_dim)
@@ -89,7 +99,7 @@ class CartPoleNMPC(MPC):
 
         return equality_constraint, equality_constraint_lower_bound, equality_constraint_upper_bound, optimization_variable_lower_bound, optimization_variable_upper_bound
 
-    # cost for one state and control input
+    # cost for one state and action
     def define_cost_function(self, state_trajectory, control_trajectory):
         """
         - state_trajectory : vector having dimension (prediction_horizon + 1)
