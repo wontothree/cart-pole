@@ -18,6 +18,7 @@ class CartPolePID():
 
         self.last_time = 0
         self.last_angle_error = 0
+        self.cumulative_angle_error = 0
     
     def set_target_angle(self, target_angle):
         # radian (-pi ~ pi)
@@ -30,20 +31,20 @@ class CartPolePID():
 
     # calculate next action from current state and target state
     def control(self, angle):
-        # proportional term
-        angle_error = abs(angle - self.target_angle)
+        
+        angle_error = (angle - self.target_angle + np.pi) % (2 * np.pi) - np.pi
 
         current_time = time.time()
         time_interval = current_time - self.last_time
 
         # integral term
-        cumulative_angle_error = angle_error * time_interval
+        self.cumulative_angle_error += angle_error * time_interval
 
         # derivative term
         derivative_angle_error = (angle_error - self.last_angle_error) / time_interval
 
         # output of pid
-        output = self.kp * angle_error + self.ki * cumulative_angle_error + self.kd * derivative_angle_error
+        output = self.kp * angle_error + self.ki * self.cumulative_angle_error + self.kd * derivative_angle_error
 
         # update last values
         self.last_angle_error = angle_error
@@ -55,27 +56,6 @@ class CartPolePID():
 class Simulation():
     def __init__(self):
         self.cart_pole_nmpc = CartPoleNMPC()
-
-    # def simulate(self, current_state, time_span):
-    #     time_steps = np.arange(time_span[0], time_span[1], self.cart_pole_nmpc.control_sampling_time)
-
-    #     I = self.make_integrator()
-        
-    #     actual_state_trajectory = [current_state.full().ravel()]
-    #     actual_control_trajectory = []
-
-    #     for time_step in time_steps:
-    #         optimal_state_trajectory, optimal_control_trajectory = self.cart_pole_nmpc.solve(current_state)
-
-    #         current_state = I(x0=current_state, p=optimal_control_trajectory[0])["xf"]
-
-    #         # 센서로부터 얻은 actual_state_trajectory를 저장해야 한다.
-    #         actual_state_trajectory.append(current_state.full().ravel())
-    #         actual_control_trajectory.append(optimal_control_trajectory[0])
-
-    #     actual_state_trajectory.pop()
-
-    #     return actual_state_trajectory, actual_control_trajectory, time_steps
 
     def simulate(self, current_state, time_span):
         time_steps = np.arange(time_span[0], time_span[1], self.cart_pole_nmpc.control_sampling_time)
@@ -253,5 +233,5 @@ if __name__ == "__main__":
     current_state = casadi.DM([0, 0.3, 0, 0])
 
     actual_state_trajectory, actual_control_trajectory, time_steps = simulation.simulate(current_state, [0, 5])
-    simulation.visualize_table(actual_state_trajectory, actual_control_trajectory, time_steps)
-    # simulation.animate(actual_state_trajectory, actual_control_trajectory, time_steps, filename="cart_pole1.gif")
+    # simulation.visualize_table(actual_state_trajectory, actual_control_trajectory, time_steps)
+    simulation.animate(actual_state_trajectory, actual_control_trajectory, time_steps, filename="cart_pole1.gif")

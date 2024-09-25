@@ -43,14 +43,14 @@ void setTargetAngle(targetAngle) {
 float controlByPID()
 {
     // proportional term
-    angleError = abs(angle - targetAngle);
+    angleError = angle - targetAngle;
 
     float currentTime = millis();
 
     float timeInterval = currentTime - lastTime;
 
     // integral term
-    float cumulativeAngleError = angleError * timeInterval;
+    cumulativeAngleError += angleError * timeInterval;
 
     // derivative term
     float derivativeAngleError = (angleError - lastAngleError) / timeInterval;
@@ -81,12 +81,4 @@ void loop()
 
     // motor control
 
-    // if (angleError > 0) {
-    //     // move right
-    // } else if (angleError < 0) {
-    //     // move left
-    // }
-}
-```
-
-What shoud this pid controller return? velocity or acceleration? I think that is acceleration. Tho it's suspicious.
+    // 
