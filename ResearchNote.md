@@ -19,22 +19,25 @@ if (angle > 0 ) { // clockwise is positive
 PID controller
 
 ```cpp
+float targetAngle;
+
 // parametric gain constant
 float kp, ki, kd;
+
 float cumulativeAngleError;
 float lastAngleError;
 
-// proportional
+// proportional term
 float angleError = abs(angle - targetAngle);
 
 float currentTime = millis();
 
 float timeInterval = currentTime - lastTime;
 
-// integral
+// integral term
 float cumulativeAngleError = angleError * timeInterval;
 
-// derivative
+// derivative term
 float derivativeAngleError = (angleError - lastAngleError) / timeInterval;
 
 // output of pid
@@ -54,5 +57,9 @@ void setConstantPID(float KP, float KI, float KD) {
 
     // derivative constant
     kd = KD;
+}
+
+void setTargetAngle(targetAngle) {
+    targetAngle = targetAngle
 }
 ```
