@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 #pragma once
 
 #include <stdint.h>
@@ -19,4 +17,3 @@ void finalizeStepperMotorPins();
  */
 void updateMotorByAcceleration(uint16_t currentCounter, float acceleration, float *currentVelocity, float *currentPosition);
 void updateMotorByVelocity(uint16_t currentCount, float velocity, float *currentPosition);
->>>>>>> e31261722b5b5b4bf62e4a4f2def918307fed6a9

@@ -16,50 +16,70 @@ if (angle > 0 ) { // clockwise is positive
 }
 ```
 
-PID controller
+PID controller giving velocity of cart
 
 ```cpp
 float targetAngle;
 
 // parametric gain constant
+float angleError;
 float kp, ki, kd;
 
 float cumulativeAngleError;
 float lastAngleError;
 
-// proportional term
-float angleError = abs(angle - targetAngle);
-
-float currentTime = millis();
-
-float timeInterval = currentTime - lastTime;
-
-// integral term
-float cumulativeAngleError = angleError * timeInterval;
-
-// derivative term
-float derivativeAngleError = (angleError - lastAngleError) / timeInterval;
-
-// output of pid
-float output = kp * angleError + ki * cumulativeAngleError + kd * derivativeAngleError;
-
-// update last values
-lastAngleError = angleError;
-lastTime = currentTime;
-
 // set parametric constant of pid controller
-void setConstantPID(float KP, float KI, float KD) {
-    // proportional constant
-    kp = KP;
-
-    // integral constant
-    ki = KI;
-
-    // derivative constant
-    kd = KD;
+void setPID(float KP, float KI, float KD) 
+{
+    kp = KP;    // proportional constant
+    ki = KI;    // integral constant
+    kd = KD;    // derivative constant
 }
 
 void setTargetAngle(targetAngle) {
     targetAngle = targetAngle
+}
+
+float controlByPID()
+{
+    // proportional term
+    angleError = abs(angle - targetAngle);
+
+    float currentTime = millis();
+
+    float timeInterval = currentTime - lastTime;
+
+    // integral term
+    float cumulativeAngleError = angleError * timeInterval;
+
+    // derivative term
+    float derivativeAngleError = (angleError - lastAngleError) / timeInterval;
+
+    // output of pid
+    float output = kp * angleError + ki * cumulativeAngleError + kd * derivativeAngleError;
+
+    // update last values
+    lastAngleError = angleError;
+    lastTime = currentTime;
+
+    return output
+}
+
+void loop()
+{
+    float interval = constant * controlByPID();
+
+    // limit max and min
+    if (interval < constant) {
+        interval = constant;
+    } else if (interval > constant) {
+        interval = constant;
+    }
+
+    if (angleError > 0) {
+        // move right
+    } else if (angleError < 0) {
+        // move left
+    }
 }
 ```
