@@ -98,6 +98,7 @@ void updateMotorByVelocity(uint16_t currentCount, float velocity, float *current
     {
         moveOneStep();
 <<<<<<< HEAD
+<<<<<<< HEAD
 
         float newMotorInterval = currentMotorInterval * SI_ACCEL_TO_HW_ACCEL / (SI_ACCEL_TO_HW_ACCEL + acceleration * currentMotorInterval * currentMotorInterval);
 
@@ -115,6 +116,8 @@ void updateMotorByVelocity(uint16_t currentCount, float velocity, float *current
         currentMotorInterval = newMotorInterval;
 
         // update last motor update count
+=======
+>>>>>>> e31261722b5b5b4bf62e4a4f2def918307fed6a9
 =======
 >>>>>>> e31261722b5b5b4bf62e4a4f2def918307fed6a9
         lastMotorUpdateCount += currentMotorInterval;
