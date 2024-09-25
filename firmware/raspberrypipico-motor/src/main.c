@@ -4,19 +4,35 @@
 #include "pico/multicore.h"
 #include "hardware/timer.h"
 #include "hardware/gpio.h"
+#include "hardware/uart.h"
+#include "hardware/irq.h"
 #include "math.h"
 
 #define abs(x) ((x) < 0 ? -(x) : (x))
 
 // UART configuration
 #define UART_ID uart0
-#define BAUD_RATE 9600
+#define BAUD_RATE 38400
 #define UART_TX_PIN 0
 #define UART_RX_PIN 1
 
 volatile float acceleration = 0.0f; // Revolutions per second squared
 volatile float velocity = 0;        // Revolutions per second
 volatile uint32_t position = 0;     // Steps
+
+/**
+ * UART RX test IRQ Handler
+ */
+// static int chars_rxed = 0;
+// void on_uart_rx()
+// {
+//     while (uart_is_readable(UART_ID))
+//     {
+//         uint8_t ch = uart_getc(UART_ID);
+//         printf("%c.", ch);
+//         chars_rxed++;
+//     }
+// }
 
 /**
  * Core 0 is responsible for acceleration control
@@ -33,8 +49,84 @@ void core0_main()
 
     // UART initialization (for encoder sensor reading)
     uart_init(UART_ID, BAUD_RATE);
-    gpio_set_function(UART_TX_PIN, GPIO_FUNC_UART);
-    gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART);
+    gpio_set_function(UART_TX_PIN, UART_FUNCSEL_NUM(UART_ID, UART_TX_PIN));
+    gpio_set_function(UART_RX_PIN, UART_FUNCSEL_NUM(UART_ID, UART_RX_PIN));
+    // uart_set_baudrate(UART_ID, BAUD_RATE);
+    // uart_set_hw_flow(UART_ID, false, false);
+    // uart_set_fifo_enabled(UART_ID, false);
+
+    // print encoder data
+    stdio_init_all();
+
+    char buffer[BUFFER_SIZE];
+    int index = 0;
+
+    // Mocking UART data input for demonstration
+    const char *mock_uart_data = "$ANG,152.3 ,11.644,110\r\n";
+
+    while (1)
+    {
+        // Simulating receiving data
+        for (int i = 0; mock_uart_data[i] != '\0'; i++)
+        {
+            char ch = mock_uart_data[i];
+            if (ch == '\n')
+            {
+                buffer[index] = '\0'; // Null-terminate the string
+
+                // Parsing logic
+                if (strncmp(buffer, "$ANG", 4) == 0)
+                { // Check if the string starts with "$ANG"
+                    int index1 = 0;
+                    int index2 = 0;
+
+                    // Find the first comma
+                    while (buffer[index1] != ',' && buffer[index1] != '\0')
+                    {
+                        index1++;
+                    }
+
+                    // Find the second comma
+                    index2 = index1 + 1;
+                    while (buffer[index2] != ',' && buffer[index2] != '\0')
+                    {
+                        index2++;
+                    }
+
+                    // Extract and convert the angle
+                    if (index1 < index2)
+                    {
+                        char angle_str[BUFFER_SIZE];
+                        strncpy(angle_str, buffer + index1 + 1, index2 - index1 - 1);
+                        angle_str[index2 - index1 - 1] = '\0'; // Null-terminate the angle string
+
+                        float current_angle = atof(angle_str); // Convert string to float
+                        printf("Current Angle: %f\n", current_angle);
+                    }
+                }
+
+                index = 0; // Reset index for the next string
+            }
+            else
+            {
+                buffer[index++] = ch;
+                if (index >= BUFFER_SIZE - 1)
+                { // Ensure buffer doesn't overflow
+                    index = BUFFER_SIZE - 1;
+                }
+            }
+        }
+
+        sleep_ms(1000); // Wait before next iteration
+    }
+
+    // ,,,
+    // uart_set_hw_flow(UART_ID, false, false);
+    // uart_set_fifo_enabled(UART_ID, false);
+    // int UART_IRQ = UART_ID == uart0 ? UART0_IRQ : UART1_IRQ;
+    // irq_set_exclusive_handler(UART_IRQ, on_uart_rx);
+    // irq_set_enabled(UART_IRQ, true);
+    // uart_set_irq_enables(UART_ID, true, false);
     printf("UART initialized\n");
 
     // Acceleration control variables
@@ -115,7 +207,7 @@ void core0_main()
             acceleration = sign * acceleration_buffer / 100.0f;
             sign = 1;
             acceleration_buffer = 0;
-            printf("Acceleration set: %f\n", acceleration);
+            // printf("Acceleration set: %f\n", acceleration);
         }
 
         // Log acceleration every second
