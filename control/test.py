@@ -32,30 +32,33 @@ class CartPolePID():
 
     # calculate next action from current state and target state
     def control(self, angle):
-        angle = casadi.DM(angle)
-
         # proportional term
-        angle_error = (angle - self.target_angle + np.pi) % (2 * np.pi) - np.pi
-        # angle_error = angle - self.target_angle
+        # angle_error = (angle - self.target_angle + np.pi) % (2 * np.pi) - np.pi
+        angle_error = angle - self.target_angle
 
         current_time = time.time()
         time_interval = current_time - self.last_time
 
-        # integral term
-        self.cumulative_angle_error += angle_error * time_interval
+        if time_interval > 0:
+            # integral term
+            self.cumulative_angle_error += angle_error * time_interval
 
-        # derivative term
-        derivative_angle_error = (angle_error - self.last_angle_error) / time_interval
+            # derivative term
+            derivative_angle_error = (angle_error - self.last_angle_error) / time_interval
 
-        # output of pid
-        output = self.kp * angle_error + self.ki * self.cumulative_angle_error + self.kd * derivative_angle_error
+            # output of pid
+            output = self.kp * angle_error + self.ki * self.cumulative_angle_error + self.kd * derivative_angle_error
 
-        # update last values
-        self.last_angle_error = angle_error
-        self.last_time = current_time
+            # output = np.clip(output, -10, 10)
 
-        # acceleration
-        return output
+            # update last values
+            self.last_angle_error = angle_error
+            self.last_time = current_time
+
+            print("output", output)
+
+            # acceleration
+            return output
 
 class Simulation():
     def __init__(self):
@@ -161,16 +164,13 @@ class Simulation():
         return I
 
     def animate(self, X, U, t_eval, filename="cart_pole.gif"):
-        # Ensure X is a NumPy array for proper indexing
         X = np.array(X)
         
-        # animation setup
-        fig = plt.figure(figsize=(20, 15)) # size
+        fig = plt.figure(figsize=(20, 15))
         ax = fig.add_subplot(111)
-        frames = np.arange(0, t_eval.size) # frame numbers
+        frames = np.arange(0, t_eval.size)
         fps = 1 / self.cart_pole_nmpc.control_sampling_time
 
-        # update function for animation
         def update_figure(i):
             x_lim_min = -0.8
             x_lim_max = 0.8
@@ -178,54 +178,42 @@ class Simulation():
             y_lim_max = 0.6
             u_scale = 50
 
-            # set up the axes
             ax.cla()
             ax.set_xlim(x_lim_min, x_lim_max)
             ax.set_ylim(y_lim_min, y_lim_max)
             ax.set_aspect("equal")
             ax.set_title(f"Cart Pole (Time = {t_eval[i]: 0.2f})", fontsize=35)
-            ax.set_facecolor("#f0f0f0")  # Set background color
+            ax.set_facecolor("#f0f0f0")
 
-            # extract state and input values
             x, theta, x_dot, theta_dot = X[i]
-            u, = U[i]
+            u = U[i].full().ravel()[0]  # CasADi 행렬에서 값 추출
 
-            # Normalize theta to the range [-pi, pi]
             theta = np.arctan2(np.sin(theta), np.cos(theta))
 
-            # calculate pole coordinates
             points = np.array([
                 [x, x - self.cart_pole_nmpc.pole_length * np.sin(theta)],
                 [0, self.cart_pole_nmpc.pole_length * np.cos(theta)]
             ])
 
-            # plot ground line
             ax.hlines(0, x_lim_min, x_lim_max, colors="black")
-
-            # Plot the pole and its shadow
-            ax.plot(*points, color="#c2a28c", lw=17, zorder=1)  # Pole
-            ax.plot(*points, color="grey", lw=8, alpha=0.5, zorder=0)  # Pole shadow
-
-            # arrow
+            ax.plot(*points, color="#c2a28c", lw=17, zorder=1)
+            ax.plot(*points, color="grey", lw=8, alpha=0.5, zorder=0)
             ax.arrow(x, 0, u / u_scale, 0, width=0.01, head_width=0.03, head_length=0.24, color="grey" if u > 0 else "grey")
 
-            # cart
-            w = 0.05  # width
-            h = 0.05  # height
-            rect = patches.Rectangle(xy=(x - w / 2, - h / 2), width=w, height=h, color="black")  # Cart color
+            w = 0.05
+            h = 0.05
+            rect = patches.Rectangle(xy=(x - w / 2, - h / 2), width=w, height=h, color="black")
             ax.add_patch(rect)
 
-            # display state and input values
             state_and_input_text = (f"position of cart: {x:.2f} m\n"
-                        f"angle of pole: {theta:.2f} rad\n"
-                        f"velocity of cart: {x_dot:.2f} m/s\n"
-                        f"angular velocity of pole: {theta_dot:.2f} rad/s\n"
-                        f"force: {u:.2f} N")
+                                    f"angle of pole: {theta:.2f} rad\n"
+                                    f"velocity of cart: {x_dot:.2f} m/s\n"
+                                    f"angular velocity of pole: {theta_dot:.2f} rad/s\n"
+                                    f"force: {u:.2f} N")
             ax.text(x_lim_max - 0.7, y_lim_max - 0.25, state_and_input_text, fontsize=25,
-                    bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5'))
+                    bbox=dict(facecolor='white', alpha=0.5))
 
-        # Create and save the animation
-        ani = FuncAnimation(fig, update_figure, frames=frames)
+        ani = FuncAnimation(fig, update_figure, frames=frames, repeat=False)
         ani.save(filename, writer="pillow", fps=fps)
 
 if __name__ == "__main__":
@@ -233,9 +221,9 @@ if __name__ == "__main__":
     cartpole_pid = CartPolePID()
 
     cartpole_pid.set_target_angle(0)
-    cartpole_pid.set_pid(1, 0, 0)
-    current_state = casadi.DM([0, 0.3, 0, 0])
+    cartpole_pid.set_pid(10, 0, 0)
+    current_state = casadi.DM([0, 0.01, 0, 0])
 
     actual_state_trajectory, actual_control_trajectory, time_steps = simulation.simulate(current_state, [0, 5])
     simulation.visualize_table(actual_state_trajectory, actual_control_trajectory, time_steps)
-    # simulation.animate(actual_state_trajectory, actual_control_trajectory, time_steps, filename="cart_pole1.gif")
+    simulation.animate(actual_state_trajectory, actual_control_trajectory, time_steps, filename="cart_pole1.gif")

@@ -81,4 +81,14 @@ void loop()
 
     // motor control
 
-    // 
+    // if (angleError > 0) {
+    //     // move right
+    // } else if (angleError < 0) {
+    //     // move left
+    // }
+}
+```
+
+What shoud this pid controller return? velocity or acceleration? I think that is acceleration. Tho it's suspicious.
+
+지글로 니콜스

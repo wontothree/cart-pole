@@ -31,8 +31,9 @@ class CartPolePID():
 
     # calculate next action from current state and target state
     def control(self, angle):
-        
-        angle_error = (angle - self.target_angle + np.pi) % (2 * np.pi) - np.pi
+        # proportional term
+        # angle_error = abs(angle - self.target_angle)
+        # angle_error = angle - self.target_angle
 
         current_time = time.time()
         time_interval = current_time - self.last_time
