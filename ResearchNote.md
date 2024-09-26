@@ -92,3 +92,9 @@ void loop()
 What shoud this pid controller return? velocity or acceleration? I think that is acceleration. Tho it's suspicious.
 
 지글로 니콜스
+
+*2024.09.26*
+
+I make timing belt tight.
+
+USB data(position, velcity) serial data and uart data (encoder data) are miexed.
