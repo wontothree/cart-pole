@@ -21,9 +21,26 @@
 
 #define BUFFER_SIZE 100
 
+#define PI 3.141592
+
 volatile float acceleration = 0.0f; // Revolutions per second squared
 volatile float velocity = 0;        // Revolutions per second
 volatile uint32_t position = 0;     // Steps
+
+void remove_whitespace(char *str)
+{
+    char *src = str;
+    char *dst = str;
+    while (*src != '\0')
+    {
+        if (!isspace((unsigned char)*src))
+        {
+            *dst++ = *src;
+        }
+        src++;
+    }
+    *dst = '\0'; // 문자열 끝 처리
+}
 
 /**
  * UART RX test IRQ Handler
@@ -76,7 +93,9 @@ void uart_callback()
                 strncpy(second_value_str, buffer + second_value_start, second_value_end - second_value_start);
                 second_value_str[second_value_end - second_value_start] = '\0';
 
-                printf("Angle of Pole: %s\n", second_value_str);
+                remove_whitespace(second_value_str);
+
+                printf("%s\n", second_value_str);
             }
 
             index = 0;
@@ -284,15 +303,15 @@ void core1_main()
             last_update_time += update_interval;
         }
 
-        // Update velocity using PID controller
-        // if (time_us - last_update_time >= update_interval)
-        // {
-        //     setPID(1.0, 0, 0);
+        // pid
+        setPID(1.0, 0, 0);
 
-        //     setTargetAngle(0);
+        setTargetAngle(0);
+        if (time_us - last_update_time >= update_interval)
+        {
 
-        //     // float acceleration = controlByPID(angle);
-        // }
+            // float acceleration = controlByPID(angle);
+        }
 
         // Limit the step holding time to max_interval
         if (time_us - time_last_us > max_interval)
