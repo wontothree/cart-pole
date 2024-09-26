@@ -80,8 +80,6 @@ void uart_callback()
                 second_value_str[second_value_end - second_value_start] = '\0';
 
                 double second_value_double = atof(second_value_str);
-
-                printf("%lf\n", second_value_double);
             }
 
             index = 0;
@@ -107,14 +105,12 @@ void core0_main()
     gpio_set_function(UART_TX_PIN, UART_FUNCSEL_NUM(UART_ID, UART_TX_PIN));
     gpio_set_function(UART_RX_PIN, UART_FUNCSEL_NUM(UART_ID, UART_RX_PIN));
 
-    // ,,,
-    //    uart_set_hw_flow(UART_ID, false, false);
-    //  uart_set_fifo_enabled(UART_ID, false);
-    //   int UART_IRQ = UART_ID == uart0 ? UART0_IRQ : UART1_IRQ;
-
-    // q_set_exclusive_handler(UART_IRQ, uart_callback); // UART IRQ handler 등록
-    //  irq_set_enabled(UART_IRQ, true);                    // UART IRQ 라인 활성화
-    //    uart_set_irq_enables(UART_ID, true, false);         // UART RX IRQ 활성화, UART TX IRQ 비활성화
+    uart_set_hw_flow(UART_ID, false, false);
+    uart_set_fifo_enabled(UART_ID, false);
+    int UART_IRQ = UART_ID == uart0 ? UART0_IRQ : UART1_IRQ;
+    irq_set_exclusive_handler(UART_IRQ, uart_callback); // UART IRQ handler 등록
+    irq_set_enabled(UART_IRQ, true);                    // UART IRQ 라인 활성화
+    uart_set_irq_enables(UART_ID, true, false);         // UART RX IRQ 활성화, UART TX IRQ 비활성화
     printf("UART initialized\n");
 
     // Acceleration control variables
@@ -289,14 +285,12 @@ void core1_main()
         }
 
         // pid
-        setPID(1.0, 0, 0);
-
-        setTargetAngle(0);
-        if (time_us - last_update_time >= update_interval)
-        {
-
-            // float acceleration = controlByPID(angle);
-        }
+        // setPID(1.0, 0, 0);
+        // setTargetAngle(0);
+        // if (time_us - last_update_time >= update_interval)
+        // {
+        //     // float acceleration = controlByPID(angle);
+        // }
 
         // Limit the step holding time to max_interval
         if (time_us - time_last_us > max_interval)
