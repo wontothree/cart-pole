@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "pico/stdio_usb.h"
 #include "pico/stdlib.h"
@@ -25,22 +26,7 @@
 
 volatile float acceleration = 0.0f; // Revolutions per second squared
 volatile float velocity = 0;        // Revolutions per second
-volatile uint32_t position = 0;     // Steps
-
-void remove_whitespace(char *str)
-{
-    char *src = str;
-    char *dst = str;
-    while (*src != '\0')
-    {
-        if (!isspace((unsigned char)*src))
-        {
-            *dst++ = *src;
-        }
-        src++;
-    }
-    *dst = '\0'; // 문자열 끝 처리
-}
+volatile int32_t position = 0;      // Steps
 
 /**
  * UART RX test IRQ Handler
@@ -93,9 +79,9 @@ void uart_callback()
                 strncpy(second_value_str, buffer + second_value_start, second_value_end - second_value_start);
                 second_value_str[second_value_end - second_value_start] = '\0';
 
-                remove_whitespace(second_value_str);
+                double second_value_double = atof(second_value_str);
 
-                printf("%s\n", second_value_str);
+                printf("%lf\n", second_value_double);
             }
 
             index = 0;
@@ -122,13 +108,13 @@ void core0_main()
     gpio_set_function(UART_RX_PIN, UART_FUNCSEL_NUM(UART_ID, UART_RX_PIN));
 
     // ,,,
-    uart_set_hw_flow(UART_ID, false, false);
-    uart_set_fifo_enabled(UART_ID, false);
-    int UART_IRQ = UART_ID == uart0 ? UART0_IRQ : UART1_IRQ;
+    //    uart_set_hw_flow(UART_ID, false, false);
+    //  uart_set_fifo_enabled(UART_ID, false);
+    //   int UART_IRQ = UART_ID == uart0 ? UART0_IRQ : UART1_IRQ;
 
-    irq_set_exclusive_handler(UART_IRQ, uart_callback); // UART IRQ handler 등록
-    irq_set_enabled(UART_IRQ, true);                    // UART IRQ 라인 활성화
-    uart_set_irq_enables(UART_ID, true, false);         // UART RX IRQ 활성화, UART TX IRQ 비활성화
+    // q_set_exclusive_handler(UART_IRQ, uart_callback); // UART IRQ handler 등록
+    //  irq_set_enabled(UART_IRQ, true);                    // UART IRQ 라인 활성화
+    //    uart_set_irq_enables(UART_ID, true, false);         // UART RX IRQ 활성화, UART TX IRQ 비활성화
     printf("UART initialized\n");
 
     // Acceleration control variables
@@ -209,14 +195,13 @@ void core0_main()
             acceleration = sign * acceleration_buffer / 100.0f;
             sign = 1;
             acceleration_buffer = 0;
-            // printf("Acceleration set: %f\n", acceleration);
         }
 
         // Log acceleration every second
         if (current_time - last_log_time >= log_interval)
         {
             last_log_time += log_interval;
-            // printf("P:%luV:%f\n", position, velocity);
+            printf("P:%ldV:%f\n", position, velocity);
         }
 
         // If the stop switch is pressed, set both velocity and acceleration to 0
