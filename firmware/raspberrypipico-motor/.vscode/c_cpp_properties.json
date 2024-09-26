@@ -1,0 +1,18 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${env:PICO_SDK_PATH}/**",
+                "${env:PICO_SDK_PATH}/src/**",
+                "${env:PICO_SDK_PATH}/src/rp2_common/**",
+                "${env:PICO_SDK_PATH}/lib/**"
+            ],
+            "defines": [],
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}

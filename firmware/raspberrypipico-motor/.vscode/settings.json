@@ -1,0 +1,12 @@
+{
+  "files.associations": {
+    "*.py": "python",
+    "*.h": "c",
+    "*.c": "c",
+  },
+  "cSpell.words": [
+    "GPIO",
+    "multicore",
+    "PICO"
+  ]
+}
