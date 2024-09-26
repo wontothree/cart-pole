@@ -49,7 +49,7 @@ void loop()
       }
 
       // print
-      Serial.print(current_angle, 3); // 3 decimal place
+      Serial.print(current_angle, 3); // 3 decimal placex 
       Serial.print(", ");
       Serial.print(angular_velocity, 3); // 3 decimal places
       Serial.print("\n");
