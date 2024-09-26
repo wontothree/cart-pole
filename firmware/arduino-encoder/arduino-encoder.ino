@@ -7,6 +7,53 @@ unsigned long previous_time = 0;
 unsigned long current_time = 0;
 float angular_velocity = 0;
 
+float targetAngle;
+float angleError;
+float kp, ki, kd;
+
+float cumulativeAngleError;
+float lastAngleError;
+
+float lastTime = 0;
+
+float action = 0;
+
+void setPID(float KP, float KI, float KD)
+{
+  kp = KP;
+  ki = KI;
+  kd = KD;
+}
+
+void setTargetAngle(float targetAngle)
+{
+  targetAngle = targetAngle;
+}
+
+float controlByPID(float angle)
+{
+  // proportional term
+  angleError = angle - targetAngle;
+
+  float currentTime = millis();
+
+  float timeInterval = currentTime - lastTime;
+
+  // integral term
+  cumulativeAngleError += angleError * timeInterval;
+
+  // derivative term
+  float derivativeAngleError = (angleError - lastAngleError) / timeInterval;
+
+  float output = kp * angleError + ki * cumulativeAngleError + kd * derivativeAngleError;
+
+  // update last values
+  lastAngleError = angleError;
+  lastTime = currentTime;
+
+  return output;
+}
+
 void setup()
 {
   // initialize USB Serial communication
@@ -34,11 +81,9 @@ void loop()
       // remove label and parse data
       float current_angle = inString.substring(index1 + 1, index2).toFloat();
 
-      // degree to radian
-      current_angle *= RADIAN_PER_DEGREE;
-
-      // 0 ~ 2pi to -pi ~ pi
-      current_angle -= PI;
+      current_angle *= RADIAN_PER_DEGREE; // degree to radian
+      current_angle -= PI;                // 0 ~ 2pi to -pi ~ pi
+      current_angle *= -1;
 
       current_time = millis();
 
@@ -48,11 +93,24 @@ void loop()
         angular_velocity = (current_angle - previous_angle) / ((current_time - previous_time) / 1000.0);
       }
 
-      // print
-      Serial.print(current_angle, 3); // 3 decimal placex 
-      Serial.print(", ");
-      Serial.print(angular_velocity, 3); // 3 decimal places
+      setPID(1, 0, 0);
+      setTargetAngle(0);
+      action = controlByPID(current_angle) * 100;
+
+      if (action > 20) {
+        action = 20;
+      } else if (action < -20) {
+        action = - 20;
+      }
+
+      Serial.print(action, 1);
       Serial.print("\n");
+
+      // print
+      // Serial.print(current_angle, 1); // 1 decimal placex
+      // Serial.print(", ");
+      // Serial.print(angular_velocity, 1);
+      // Serial.print("\n");
 
       // update previous angle and time
       previous_angle = current_angle;
