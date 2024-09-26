@@ -178,7 +178,7 @@ void core0_main()
 
     // Position PID variables
     float last_position_error = 0;
-    float kPPos = 2.f / 300.f;
+    float kPPos = 4.f / 300.f;
     float kDPos = 0.2f / 300.f;
 
     // Main loop
