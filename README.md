@@ -2,7 +2,10 @@
 
 [Cart Pole Research Note](https://wontothree.github.io/cartpole)
 
-![cart_pole1](https://github.com/user-attachments/assets/0118e565-fe6b-40f5-a51b-683e93653d1d)
+![cart_pole](https://github.com/user-attachments/assets/72d6b4f6-5a6c-4282-9a7e-d9e3e6b6e6f7)
+
+![time-response](https://github.com/user-attachments/assets/0fe4585a-a5b3-45ab-9681-709f0afb8b99)
+
 
 - mass of cart : 0.123 kg (122.61g)
 - length of cart : 0.045m (4.5cm)

@@ -288,14 +288,6 @@ void core1_main()
             last_update_time += update_interval;
         }
 
-        // pid
-        // setPID(1.0, 0, 0);
-        // setTargetAngle(0);
-        // if (time_us - last_update_time >= update_interval)
-        // {
-        //     float acceleration = controlByPID(angle);
-        // }
-
         // Limit the step holding time to max_interval
         if (time_us - time_last_us > max_interval)
         {
