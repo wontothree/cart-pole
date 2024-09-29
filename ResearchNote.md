@@ -184,3 +184,5 @@ What shoud this pid controller return? velocity or acceleration? I think that is
 I make timing belt tight.
 
 USB data(position, velcity) serial data and uart data (encoder data) are miexed.
+
+When i meake angle data to be obtained from encoder, motor command do not work.
