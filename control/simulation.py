@@ -31,11 +31,14 @@ class Simulation():
         actual_state_trajectory.pop()
 
         return actual_state_trajectory, actual_control_trajectory, time_steps
-    
+        
     def visualize_table(self, actual_state_trajectory, actual_control_trajectory, time_steps):
         # Convert state and control trajectories to NumPy arrays
         actual_state_trajectory = np.array(actual_state_trajectory)
         actual_control_trajectory = np.array(actual_control_trajectory)
+        
+        # 각도 x2 (폴의 각도) 값을 -pi ~ pi 사이로 정규화
+        actual_state_trajectory[:, 1] = np.arctan2(np.sin(actual_state_trajectory[:, 1]), np.cos(actual_state_trajectory[:, 1]))
         
         # Ensure time_steps is a NumPy array
         time_steps = np.array(time_steps)
@@ -57,11 +60,12 @@ class Simulation():
             plt.step(time_steps[:len(actual_control_trajectory)], actual_control_trajectory[:, k], linestyle="--", label=f"u_{k}")
         plt.legend()
         plt.xlabel("Time")
-        plt.ylabel("Control")
-        plt.title("Control Trajectories")
+        plt.ylabel("Action")
+        plt.title("Action Trajectories")
 
         plt.tight_layout()
         plt.show()
+
 
     def make_f(self):
         # constant parameter

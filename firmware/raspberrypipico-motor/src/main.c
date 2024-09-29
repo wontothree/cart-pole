@@ -20,69 +20,66 @@
 #define UART_TX_PIN 0
 #define UART_RX_PIN 1
 
-#define BUFFER_SIZE 100
+#define BUFFER_SIZE 50
 
 #define PI 3.141592
 
 volatile float acceleration = 0.0f; // Revolutions per second squared
 volatile float velocity = 0;        // Revolutions per second
 volatile int32_t position = 0;      // Steps
+volatile float angle = 0;           // Angle
 
-/**
- * UART RX test IRQ Handler
- */
+#define STATE_IDLE 0x01
+#define STATE_READY 0x02
+#define STATE_READ 0x04
 
-// uart 입력이 들어올 때마다 자동으로 호출되는 함수
-// IRQ handler
+uint8_t c;
+char buffer[BUFFER_SIZE];
+int uart_buf_index = 0;
+uint8_t state = STATE_IDLE;
+
 void uart_callback()
 {
+
     while (uart_is_readable(UART_ID))
     {
-        static uint8_t ch;
-        ch = uart_getc(UART_ID);
-        static char buffer[BUFFER_SIZE];
-        static int index = 0;
+        c = uart_getc(UART_ID);
 
-        buffer[index++] = ch;
-
-        if (ch == '\n')
+        switch (state)
         {
-            buffer[index] = '\0';
+        case STATE_IDLE:
+        {
+            if (c != '$')
+                break;
+            state = STATE_READY;
+            break;
+        }
 
-            // select the second - angle
-            if (strncmp(buffer, "$ANG", 4) == 0)
+        case STATE_READY:
+        {
+            if (c == ',')
             {
-                int comma_count = 0;
-                int second_value_start = 0;
-
-                for (int i = 0; buffer[i] != '\0'; i++)
-                {
-                    if (buffer[i] == ',')
-                    {
-                        comma_count++;
-                        if (comma_count == 1)
-                        {
-                            second_value_start = i + 1;
-                            break;
-                        }
-                    }
-                }
-                // find index of the second
-                int second_value_end = second_value_start;
-                while (buffer[second_value_end] != ',' && buffer[second_value_end] != '\0')
-                {
-                    second_value_end++;
-                }
-
-                // obtain the second
-                char second_value_str[BUFFER_SIZE];
-                strncpy(second_value_str, buffer + second_value_start, second_value_end - second_value_start);
-                second_value_str[second_value_end - second_value_start] = '\0';
-
-                double second_value_double = atof(second_value_str);
+                uart_buf_index = 0;
+                state = STATE_READ;
             }
+            break;
+        }
 
-            index = 0;
+        case STATE_READ:
+        {
+            if (c == ',')
+            {
+                buffer[uart_buf_index++] = '\0';
+                angle = -(float)(atof(buffer) - 180);
+                state = STATE_IDLE;
+                break;
+            }
+            if (c == '.' || (c >= '0' && c <= '9'))
+            {
+                buffer[uart_buf_index++] = c;
+            }
+            break;
+        }
         }
     }
 }
@@ -113,20 +110,12 @@ void core0_main()
     uart_set_irq_enables(UART_ID, true, false);         // UART RX IRQ 활성화, UART TX IRQ 비활성화
     printf("UART initialized\n");
 
-    // Acceleration control variables
-    int32_t sign = 1;
-    int32_t acceleration_buffer = 0;
-
-    // Log variables
-    uint32_t last_log_time = time_us_32();
-    uint32_t log_interval = 10000; // 10ms
-
     // Stop switch variables
     const uint STOP_SWITCH_PIN = 16;
     gpio_init(STOP_SWITCH_PIN);
     gpio_set_dir(STOP_SWITCH_PIN, GPIO_IN);
 
-    // Initialization step
+    // Stepper position initialization step
     {
         // Fast homing
         printf("Initializing...\n");
@@ -170,44 +159,59 @@ void core0_main()
         acceleration = 0;
     }
 
+    // Wait until abs angle is small enough
+    while (abs(angle) > 1.0f)
+    {
+        sleep_ms(1);
+    };
+
+    // Log variables
+    uint32_t last_log_time = time_us_32();
+    uint32_t log_interval = 10000; // 10ms
+
+    // balancing PID variables
+    uint32_t last_control_time = time_us_32();
+    uint32_t control_interval = 1000; // 1ms;
+    float last_error = 0;
+    float kP = 10.f;
+    float kD = 1.0f;
+
+    // Position PID variables
+    float last_position_error = 0;
+    float kPPos = 4.f / 300.f;
+    float kDPos = 0.2f / 300.f;
+
     // Main loop
     while (true)
     {
         // Update velocity
         uint32_t current_time = time_us_32();
+        if (current_time - last_control_time >= control_interval)
+        {
+            uint32_t dt = current_time - last_control_time;
+            last_control_time += control_interval;
 
-        // Read acceleration from USB serial
-        int c = getchar_timeout_us(0);
-        if (c == '-')
-        {
-            sign = -1;
-        }
-        else if (c >= '0' && c <= '9')
-        {
-            acceleration_buffer = acceleration_buffer * 10 + (c - '0');
-        }
-        else if (c == '\r' || c == '\n')
-        {
-            acceleration = sign * acceleration_buffer / 100.0f;
-            sign = 1;
-            acceleration_buffer = 0;
+            float posErr = position;
+            float dPosErr = (posErr - last_position_error) * 1000000.f / dt;
+            last_position_error = posErr;
+            float posCompensation = posErr * kPPos + dPosErr * kDPos;
+
+            float err = angle + posCompensation;
+            float dErr = (err - last_error) * 1000000.f / dt;
+            last_error = err;
+            acceleration = err * kP + dErr * kD;
         }
 
-        // Log acceleration every second
-        if (current_time - last_log_time >= log_interval)
-        {
-            last_log_time += log_interval;
-            printf("P:%ldV:%f\n", position, velocity);
-        }
+        // // Log acceleration every second
+        // if (current_time - last_log_time >= log_interval)
+        // {
+        //     last_log_time += log_interval;
+        //     printf("P:%ldV:%f\n", position, velocity);
+        //     printf("%f\n", acceleration);
+        // }
 
         // If the stop switch is pressed, set both velocity and acceleration to 0
-        if (gpio_get(STOP_SWITCH_PIN))
-        {
-            velocity = 0;
-            acceleration = 0;
-        }
-
-        if (position < -1900)
+        if (gpio_get(STOP_SWITCH_PIN) || position > 1900 || position < -1900 || abs(angle) > 45)
         {
             velocity = 0;
             acceleration = 0;
@@ -283,14 +287,6 @@ void core1_main()
             velocity += acceleration * (time_us - last_update_time) / 1000000.0f;
             last_update_time += update_interval;
         }
-
-        // pid
-        // setPID(1.0, 0, 0);
-        // setTargetAngle(0);
-        // if (time_us - last_update_time >= update_interval)
-        // {
-        //     // float acceleration = controlByPID(angle);
-        // }
 
         // Limit the step holding time to max_interval
         if (time_us - time_last_us > max_interval)

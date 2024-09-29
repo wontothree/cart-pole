@@ -35,7 +35,6 @@ class CartPoleNMPC(MPC):
         '''
         discrete time state space model
         '''
-
         # constant parameter
         g = self.gravity
         M = self.cart_mass
@@ -81,7 +80,6 @@ class CartPoleNMPC(MPC):
         - equality constraint by dynamic model
         - inequality constraint
         '''
-
         discretized_dynamic_model = self.define_dynamic_model()
         # equality constraint
         equality_constraint_lower_bound = [0] * (self.prediction_horizon * self.state_dim)

@@ -3,8 +3,12 @@ set -e
 cd `dirname $0`/..
 ROOT=`pwd`
 
+# Remove auto-generated build directory
+rm -rf $ROOT/build
+
 # Build the project
-mkdir -p build
-cd build
-cmake ..
+mkdir -p /tmp/build
+cd /tmp/build
+cmake $ROOT
 make
+cp /tmp/build/*.uf2 $ROOT
