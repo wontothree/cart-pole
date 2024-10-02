@@ -84,7 +84,7 @@ void uart_callback()
     }
 }
 
-/**
+/*
  * Core 0 is responsible for acceleration control
  */
 void core0_main()
@@ -219,7 +219,7 @@ void core0_main()
     }
 }
 
-/**
+/*
  * Core 1 is responsible for driving the stepper motor
  */
 void core1_main()
@@ -280,7 +280,7 @@ void core1_main()
             }
         }
 
-        // // Update velocity every 1ms
+        // Update velocity every 1ms
         time_us = time_us_64();
         if (time_us - last_update_time >= update_interval)
         {
