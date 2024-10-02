@@ -6,7 +6,6 @@
 
 ![time-response](https://github.com/user-attachments/assets/0fe4585a-a5b3-45ab-9681-709f0afb8b99)
 
-
 - mass of cart : 0.123 kg (122.61g)
 - length of cart : 0.045m (4.5cm)
 - mass of pole : 0.089 kg (88.68g)
@@ -15,4 +14,12 @@
 - length of rail (linear guide) : 0.72m (72cm)
 - maximum magnitude of force : 1.2 N
 
-## Getting Started
+# Getting Started
+
+# Hardware
+
+- Stepper Motor
+- Stepper Motor Driver
+- Absolute Rotart Encoder
+- Photo Interrupt Sensor
+- Raspberry Pi Pico 1
