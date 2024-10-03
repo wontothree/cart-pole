@@ -16,10 +16,10 @@
 
 # Getting Started
 
-# Hardware
+# Tested Electronics and Hardware
 
-- Stepper Motor
-- Stepper Motor Driver
-- Absolute Rotart Encoder
-- Photo Interrupt Sensor
-- Raspberry Pi Pico 1
+- [Stepper Motor] [KH42JM2-901](https://www.devicemart.co.kr/goods/view?no=5940&srsltid=AfmBOopF3Z02sUELxHHAz878OOVELAbprR9T91Zf7mzfW7ogoIswz9ud): 27,000 won
+- [Stepper Motor Driver] [AM-CS2P](https://www.devicemart.co.kr/goods/view?no=6773): 25,000 won
+- [Absolute Rotary Encoder] [EN25-Absolute](https://www.devicemart.co.kr/goods/view?no=15454627): 75,000 won
+- [End Stop] [Photo Interrupter Sensor](https://smartstore.naver.com/misoparts/products/5263638196?): 300 won
+- [Processor] [Raspberry Pi Pico 1](https://www.devicemart.co.kr/goods/view?no=14021609&src=raspberrypi): 6,400 won
