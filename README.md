@@ -6,7 +6,7 @@
 
 ![time-response](https://github.com/user-attachments/assets/0fe4585a-a5b3-45ab-9681-709f0afb8b99)
 
-# Hardware
+# Physical Specifications
 
 - mass of cart : 0.123 kg (122.61g)
 - length of cart : 0.045m (4.5cm)
