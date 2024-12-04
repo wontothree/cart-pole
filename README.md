@@ -34,4 +34,4 @@
 |Timing Idler||900 won|
 |Timing Belt||1,412 won|
 |||
-|Sheet Metal||130,000 won|
+|Sheet Metal (Aluminum)||130,000 won|
