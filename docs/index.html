@@ -34,27 +34,29 @@
             <div>- 학부생들 본인의 지식과 노력으로 만든 작품만 출품 가능</div>
             <div>- 팀당 최대 50만원 재료비 지원 (개인 사비 지출 금지)</div>
 
-            <h2>Individual Object</h2>
+            <h2>Individual Object and Retrospect</h2>
             <div>1. [Hardware] 프로젝트를 진행하면 나는 항상 소프트웨어 파트를 맡았다. 프로젝트를 많이 할지라도 하드웨어에 대한 지식은 진전을 이루지 못했다. 이번 기회를 통해 하드웨어에 대한 두려움을 극복하고 전문성을 갖추고싶었다.</div>
             <div>2. [Myself from A to Z] 많은 프로젝트를 하더라도 분업을 하기 때문에 프로젝트의 큰 방향을 이해하며 세부적인 것까지 파악하기란 어려웠다. A부터 Z까지 내가 주도하는 프로젝트에 대한 갈증이 있었다.</div>
             <div>3. [Implementation] 이론으로만 알고 있던 MPC controller와 RL controller를 직접 구현하고 적용해보고 싶었다.</div>
-
-            <h2>Retrospect</h2>
-            <div>시연하는 과정에서 세게 치는 사람이 많았다. 나는 굉장히 긴 길이의 막대를 사용하기 때문에 살짝만 쳐도 막대의 중심축 입장에서 큰 관성력이 작용하게 되어 넘어질 수밖에 없다. (plz don't touch...)</div>
-            <div>4등을 해서 인기상을 수상했다. 교수들의 평가에 의해 결정되는 1~3등과 달리, 인기상은 학생들의 투표에 의해 결정된다. 교수들의 푱가 기준에는 들지 못했던 것 같다. 두 가지 부분이 부족했을 것이라 예상된다. 첫 번째는 전전컴에서 다루는 범위를 벗어난 것들을 포함하고 있었다. 두 번째는 학부 수준을 벗어나는 내용들이 많았다. 나름 결과와 발표가 준수했음에도 이 부분에서 다른 팀에게 밀렸던 것이라 생각한다.</div>
-            <div>하지만 내 부스가 가장 많은 사람이 몰렸을 만큼 많은 사람들이 방문해주었다. 친구가 말하길 나를 중심으로 모든 사람이 몰려들었다고 했다. 이런 대회에서 중요한 요소 중 하나가 시각적으로 자극적인 걸 하는 것이다. 적당히 이 정도는 되겠지라고 생각하는 것 이상으로 자극적일수록 좋다.</div>
-            <div>첫 포스터 발표였다. 다른 내용은 다소 부족했을지라도 "PID is All You Need" 이름 하나는 너무 마음에 든다.</div>
+            <div>- 시연하는 과정에서 세게 치는 사람이 많았다. 나는 굉장히 긴 길이의 막대를 사용하기 때문에 살짝만 쳐도 막대의 중심축 입장에서 큰 관성력이 작용하게 되어 넘어질 수밖에 없다. (plz don't touch...)</div>
+            <div>- 4등을 해서 인기상을 수상했다. 교수들의 평가에 의해 결정되는 1~3등과 달리, 인기상은 학생들의 투표에 의해 결정된다. 교수들의 푱가 기준에는 들지 못했던 것 같다. 두 가지 부분이 부족했을 것이라 예상된다. 첫 번째는 전전컴에서 다루는 범위를 벗어난 것들을 포함하고 있었다. 두 번째는 학부 수준을 벗어나는 내용들이 많았다. 나름 결과와 발표가 준수했음에도 이 부분에서 다른 팀에게 밀렸던 것이라 생각한다.</div>
+            <div>- 하지만 내 부스가 가장 많은 사람이 몰렸을 만큼 많은 사람들이 방문해주었다. 친구가 말하길 나를 중심으로 모든 사람이 몰려들었다고 했다. 이런 대회에서 중요한 요소 중 하나가 시각적으로 자극적인 걸 하는 것이다. 적당히 이 정도는 되겠지라고 생각하는 것 이상으로 자극적일수록 좋다.</div>
+            <div>- 첫 포스터 발표였다. 다른 내용은 다소 부족했을지라도 "PID is All You Need" 이름 하나는 너무 마음에 든다.</div>
+            <div>- 저렴한 가격에 맞추는 것이 어려웠다. 가격 제한으로 인해 저렴한 stepper motor를 사용해야 하는 상황이었다. 일반적으로 산업에서는 stepper motor를 정확한 위치를 통해 제어하는 것으로 알고 있다. 하지만 내 상황에서는 가속도를 제어해야 하는 상황이었다. 왜냐하면 controller는 가속도 명령을 내리기 때문이다. 이를 위한 모터 제어가 어려운 부분이었다.</div>
+            <div>- 어떤 교수님이 폴을 세게 쳤는데 재시작 하니 폴이 발산하는 상황이 발생했다. 얼마나 아찔했는지 모른다. 하나씩 디버깅하면서 원인을 찾아야 했다. 하나씩 테스트해보니 시현하는 과정에서 사람들이 하도 세게 쳐서 timing pulley가 풀렸던 것이다. 코드의 각 요소들이 뭉쳤을 때도 의미가 있어야 하지만 독립적으로도 테스트 가능한 구조로 코드를 작성하는 것이 얼마나 중요한지 느끼게 되었다.</div>
+            <div>- 대회 규정상 대학원생과 교수의 도움을 받을 수는 없었을지라도 나는 cart pole을 제작하는 과정에서 mechanical enginneering, electrical engineering, computer science를 공부하고 있는 학부 친구들로부터 조언과 도움을 받았다. 로보틱스를 위해서는 다양한 학문이 융합되어야 한다는 것을 다시 깨닫게 되는 순간이었다.</div>
+            <div>- 사실 이 프로젝트를 처음 시작할 당시의 거창한 목표는 numerical analysis of Model-based and Model-Free control method in Cart Pole이라는 굉장히 거창한 주제였으나 달성하지는 못했다.</div>
         </div>
 
         <h1>Research and Development</h1>
         <div class="box">
             <img src="eceif-poster.png" alt="Cart Pole" style="display:block; margin:auto; width:50%; height:auto;">
 
-            <div>Introduction</div>
+            <h2>Introduction</h2>
             <div>
                 The Cart-Pole, a classical benchmark problem in control, consists of a cart, driven left or right by a linear actuator, and a pole attached to the cart via an un-actuated joint.  The goal is to swing the pole up and balance it above the cart using motor control.
 
-                I am independently developing all aspects of the Linear Inverted Pendulum, including dynamic model, mechanical design, electronics, hardware fabrication, simulation environment setup, and control.
+                I am independently developing all aspects of the Linear Inverted Pendulum, including dynamic model, mechanical design, electronics, hardware fabrication, simulation environment setup, and control. Inverted Pendulum은 로보틱스 분야의 다음한 분야에 응용 가능하다. 2족보행 로봇이나 SpaceX의 dynamics도 로켓도 결국에는 inverted pendulum의 dynamics를 확장한 것이다.
             </div>
 
             <h2>Hardware and Electronics</h2>
@@ -80,8 +82,6 @@
             <div>- inertia of pole : 0.004 746 kg m^2</div>
             <div>- length of rail (linear guide) : 0.72m (72cm)</div>
             <div>- maximum magnitude of force : 1.2 N</div>
-
-            
         </div>
     </div>
 </body>
