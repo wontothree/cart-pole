@@ -20,7 +20,7 @@
 - length of rail (linear guide) : 0.72m (72cm)
 - maximum magnitude of force : 1.2 N
 
-# Materials
+## Materials
 
 |Name|Product|Price|
 |---|---|---|
