@@ -1,10 +1,14 @@
 # Propopropositional Integral Derivative and Nonlinear Model Predictive Control in Cart Pole
 
-[Cart Pole Research Note](https://wontothree.github.io/cartpole)
+## Sinulation Result
 
 ![cart_pole](https://github.com/user-attachments/assets/72d6b4f6-5a6c-4282-9a7e-d9e3e6b6e6f7)
 
 ![time-response](https://github.com/user-attachments/assets/0fe4585a-a5b3-45ab-9681-709f0afb8b99)
+
+## Physical Result
+
+[![Watch the video](https://img.youtube.com/vi/Vz5JtkAQwwo/maxresdefault.jpg)](https://www.youtube.com/shorts/Vz5JtkAQwwo)
 
 # Physical Specifications
 
