@@ -3,149 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Anthony Garcia's Career page">
+    <meta name="description" content="Cart Pole System Design and Control with NMPC and PID">
     <meta name="author" content="Anthony Garcia">
-    <title>Anthony Garcia's Career</title>
+    <title>Cart Pole System Design and Control with NMPC and PID</title>
     <link rel="stylesheet" href="https://wontothree.github.io/career/index.css">
 </head>
 <body>
     <header class="header"></header>
 
     <br><br>
-    
+
     <div class="base">
-        <h1>Introduction</h1>
-        <div class="box">
-            <div>
-                I made a physical Cart-Pole (Inverted Pendulum) system with just 272 USD and applied nonlinear model predictive control (in simulation) as well as PID control (on the physical system)!
-            </div>
-            <br>
-            <div>
-                The Cart-Pole, a classic benchmark problem in control, consists of a cart driven by a linear actuator and a pole attached via an unactuated joint. If the pole is positioned vertically, its dynamics predict it will fall due to instability. The goal of the controller is to swing the pole up and balance it above the cart. The model and controller of the inverted pendulum are foundational for many systems, including humanoid robots and SpaceX's Starship.
-            </div>
-            <br>
-            <div>
-                The process of my project can be divided into the following steps:
-            </div>
-            <div>
-                1. Mechanical Design: 3D modeling using Fusion 360 to design the physical structure of the system
-            </div>
-            <div>
-                2. Electronics: Select specifications for sensors, actuators, processors, and other components
-            </div>
-            <div>
-                3. Motor Control: Acceleration-based control of the stepper motor
-            </div>
-            <div>
-                4. Hardware Fabrication
-            </div>
-            <div>
-                5. Feedback (Closed) Loop: Measure real-time defined states through actuators and sensors, or estimate them using a state observer
-            </div>
-            <div>
-                6. Simulation Environment: Set up a simulation environment in Python to validate control strategies for the Cart-Pole system
-            </div>
-            <div>
-                7. Control: Formulate mathematical models and optimization problems for Model Predictive Control (MPC)
-            </div>
-            <div>
-                8. Experiment: Tune parameters
-            </div>
-            <br>
-            <div>
-                I won the Popular Prize at the UOS ECE Innovation Fair and presented my project to the Department of Mathematics, thanks to Professor Dohyeon Kwon’s invitation, focusing on differential equations and mathematical optimization. I received valuable advice from undergraduate students in mechanical, electrical, and computer engineering. All of it was truly enjoyable.
-            </div>
-        </div>
+        <!-- Project Overview -->
+        <section style="width: 100%; margin-bottom: 40px;">
+            <h1 style="font-size: 1.87rem;">📁 Project Overview</h1>
+            <div class="box">
+                <h2>🚀 Project Name</h2>
+                <p><strong>PID is All You Need: Cart Pole System Design and Control with NMPC and PID</strong></p>
 
-        <h1>Mechanical Design and Electronics</h1>
-        <div class="box">
-            <h2>3D Modeling</h2>
-            <img src="imgs/cartpole-3d.png" alt="Cart Pole" style="display:block; margin:auto; width:90%; height:auto;">
+                <h2>🗓 Project Duration</h2>
+                <p>2024.07.25 - 2024.09.27</p>
 
-            <h2>Physical Speficiation</h2>
-            <img src="imgs/assembly.png" alt="Cart Pole" style="display:block; margin:auto; width:90%; height:auto;">
+                <h2>💼 Competition</h2>
+                <p>People's Choise Award, UOS ECE IF (Innovation Fair) Competition (Prize Money $200)</p>
 
-            <br>
-            <div>- Stepper Motor: 27,000 KRW ($18.25 USD)</div>
-            <div>- Stepper Motor Driver: 25,000 KRW ($16.91 USD)</div>
-            <div>- Absolute Rotary Encoder: 75,000 KRW ($50.75 USD)</div>
-            <div>- Photo Interrupter Sensor (x2): 600 KRW ($0.41 USD)</div>
-            <div>- Raspberry Pi Pico 1: 6,400 KRW ($4.32 USD)</div>
-            <div>- Cedar Wooden Plank: 28,000 KRW ($18.96 USD)</div>
-            <div>- Wooden Rod: 2,800 KRW ($1.89 USD)</div>
-            <div>- Linear Guide: 45,913 KRW ($30.97 USD)</div>
-            <div>- Shaft Holder: 7,260 KRW ($4.91 USD)</div>
-            <div>- Timing Pulley: 1,500 KRW ($1.01 USD)</div>
-            <div>- Timing Idler: 900 KRW ($0.61 USD)</div>
-            <div>- Timing Belt: 1,412 KRW ($0.95 USD)</div>
-            <div>- Sheet Metal (Aluminum): 130,000 KRW ($87.81 USD)</div>
-            <div>- Wires, screws, and other consumables: 50,000 KRW ($33.84 USD)</div>
-            <div>Total: 401,785 won (271.66 USD)</div>
-            <br>
+                <h2>🧑‍🤝‍🧑 Team Member and Role</h2>
+                <ul>
+                    <li><strong>Sewon Kim</strong></li>
+                </ul>
+            </div>
+        </section>
 
-            <div>- mass of cart : 0.123 kg (122.61g)</div>
-            <div>- length of cart : 0.045m (4.5cm)</div>
-            <div>- mass of pole : 0.089 kg (88.68g)</div>
-            <div>- length of pole : 0.4m (40cm)</div>
-            <div>- inertia of pole : 0.004 746 kg m^2</div>
-            <div>- length of rail (linear guide) : 0.72m (72cm)</div>
-            <div>- maximum magnitude of force : 1.2 N</div>
+        <!-- Demonstation -->
+        <section style="width: 100%; margin-bottom: 40px;">
+            <h1 style="font-size: 1.87rem;">🎥 Demonstation</h1>
 
-            <h2>System Architecture</h2>
-            <img src="imgs/block-diagram.png" alt="Cart Pole" style="display:block; margin:auto; width:90%; height:auto;">
-        </div>
-    
-        <h1>Motor Controller, State Observer, and MPC</h1>
-        <div class="box">
-            <div>
-                <a href="https://wontothree.github.io/tmp/motor-controller-and-state-observer/" target="_blank" style="text-decoration:none; color:inherit;">
-                    Motor Controller and State Observer
-                </a>
+            <div class="box">
+                <h2>Simulation Result</h2>
+                <img src="imgs/cart_pole.gif" alt="Cart Pole Simulation" style="display:block; margin:auto; width:100%; height:auto;">
                 <br>
-                <a href="https://wontothree.github.io/tmp/nmpc/" target="_blank" style="text-decoration:none; color:inherit;">
-                    NMPC
-                </a>
+
+                <h2>Physical Result</h2>
+                <div style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%; /* 16:9 비율 */">
+                    <iframe src="https://www.youtube.com/embed/Vz5JtkAQwwo" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"></iframe>
+                </div>
+                <br>
+
+                <h2>Poster</h2>
+                <img src="imgs/eceif-poster.png" alt="Cart Pole Poster" style="display:block; margin:auto; width:100%; height:auto;">
             </div>
-        </div>
-        
-        <h1>Experiment</h1>
-        <div class="box">
-            <div>Simulation Result</div>
-            <img src="imgs/cart_pole.gif" alt="Cart Pole Simulation" style="display:block; margin:auto; width:100%; height:auto;">
-            <br>
+        </section>
 
-            <div>Physical Result</div>
-            <div style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%; /* 16:9 비율 */">
-                <iframe src="https://www.youtube.com/embed/Vz5JtkAQwwo" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen
-                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"></iframe>
+        <!-- Competition -->
+        <section style="width: 100%; margin-bottom: 40px;">
+            <h1 style="font-size: 1.87rem;">💼 Competition</h1>
+            <div class="box">
+                <ul>
+                    <li>Target participants: Undergraduate students in the Department of Electrical and Computer Engineering</li>
+                    <li>Exhibition of project outcomes developed through the application of major coursework knowledge and personal initiative</li>
+                    <li>Only projects created by undergraduate students using their knowledge and efforts are eligible for submission</li>
+                    <li>Material costs of up to 500,000 KRW per team are covered (personal expenses are not permitted)</li>
+                </ul>
             </div>
-        </div>
+        </section>
 
-        <h1>Reference</h1>
-        <div class="box">
-            Nonlinear Model Predictive Control of an Inverted Pendulum
-        </div>
+        <!-- Introduction -->
+        <section style="width: 100%; margin-bottom: 40px;">
+            <h1 style="font-size: 1.87rem;">🎯 Introduction</h1>
+            <div class="box">
+                <div>
+                    I made a physical Cart-Pole (Inverted Pendulum) system with just 272 USD and applied nonlinear model predictive control (in simulation) as well as PID control (on the physical system)!
+                </div>
+                <br>
+                <div>
+                    The Cart-Pole, a classic benchmark problem in control, consists of a cart driven by a linear actuator and a pole attached via an unactuated joint. If the pole is positioned vertically, its dynamics predict it will fall due to instability. The goal of the controller is to swing the pole up and balance it above the cart. The model and controller of the inverted pendulum are foundational for many systems, including humanoid robots and SpaceX's Starship.
+                </div>
+                <br>
+                <div>
+                    The process of my project can be divided into the following steps:
+                </div>
+                <ol>
+                    <li>Mechanical Design: 3D modeling using Fusion 360 to design the physical structure of the system</li>
+                    <li>Electronics: Select specifications for sensors, actuators, processors, and other components</li>
+                    <li>Motor Control: Acceleration-based control of the stepper motor</li>
+                    <li>Hardware Fabrication</li>
+                    <li>Feedback (Closed) Loop: Measure real-time defined states through actuators and sensors, or estimate them using a state observer</li>
+                    <li>Simulation Environment: Set up a simulation environment in Python to validate control strategies for the Cart-Pole system</li>
+                    <li>Control: Formulate mathematical models and optimization problems for Model Predictive Control (MPC)</li>
+                    <li>Experiment: Tune parameters</li>
+                </ol>
+                <br>
+                <div>
+                    I won the Popular Prize at the UOS ECE Innovation Fair and presented my project to the Department of Mathematics, thanks to Professor Dohyeon Kwon’s invitation, focusing on differential equations and mathematical optimization. I received valuable advice from undergraduate students in mechanical, electrical, and computer engineering. All of it was truly enjoyable.
+                </div>
+                <br>
+                <a href="https://www.linkedin.com/feed/update/urn:li:activity:7279927444063576064/" target="_blank" style="color: #004080;">LinkedIn Post</a>
+            </div>
+        </section>
 
-        <h1>Project</h1>
+        <!-- Development -->
+        <section style="width: 100%; margin-bottom: 40px;">
+            <h1 style="font-size: 1.87rem;">💡 Development</h1>
 
-        <div class="box">
-            <div>PID is All You Need: Cart Pole System Design and Control with NMPC and PID</div>
-            <div>- Project Duration: 07/25/2024-09/27/2024</div>
-            <div>- Populatity Prize at UOS ECE IF (Innovation Fair) Competition held by department of electrical and computer engineering school</div>
-            <div>- Team Member: Sewon Kim</div>
+            <div class="box">
+                <h1>Electronics</h1>
+                <div>- Stepper Motor: 27,000 KRW ($18.25 USD)</div>
+                <div>- Stepper Motor Driver: 25,000 KRW ($16.91 USD)</div>
+                <div>- Absolute Rotary Encoder: 75,000 KRW ($50.75 USD)</div>
+                <div>- Photo Interrupter Sensor (x2): 600 KRW ($0.41 USD)</div>
+                <div>- Raspberry Pi Pico 1: 6,400 KRW ($4.32 USD)</div>
+                <div>- Cedar Wooden Plank: 28,000 KRW ($18.96 USD)</div>
+                <div>- Wooden Rod: 2,800 KRW ($1.89 USD)</div>
+                <div>- Linear Guide: 45,913 KRW ($30.97 USD)</div>
+                <div>- Shaft Holder: 7,260 KRW ($4.91 USD)</div>
+                <div>- Timing Pulley: 1,500 KRW ($1.01 USD)</div>
+                <div>- Timing Idler: 900 KRW ($0.61 USD)</div>
+                <div>- Timing Belt: 1,412 KRW ($0.95 USD)</div>
+                <div>- Sheet Metal (Aluminum): 130,000 KRW ($87.81 USD)</div>
+                <div>- Wires, screws, and other consumables: 50,000 KRW ($33.84 USD)</div>
+                <div>Total: 401,785 won (271.66 USD)</div>
+                <br>
+                <div>- mass of cart : 0.123 kg (122.61g)</div>
+                <div>- length of cart : 0.045m (4.5cm)</div>
+                <div>- mass of pole : 0.089 kg (88.68g)</div>
+                <div>- length of pole : 0.4m (40cm)</div>
+                <div>- inertia of pole : 0.004 746 kg m^2</div>
+                <div>- length of rail (linear guide) : 0.72m (72cm)</div>
+                <div>- maximum magnitude of force : 1.2 N</div>
 
-            <h2>Competition</h2>
-            <div>- Target participants: Undergraduate students in the Department of Electrical and Computer Engineering</div>
-            <div>- Exhibition of project outcomes developed through the application of major coursework knowledge and personal initiative</div>
-            <div>- Only projects created by undergraduate students using their knowledge and efforts are eligible for submission</div>
-            <div>- Material costs of up to 500,000 KRW per team are covered (personal expenses are not permitted)</div>
+                <h1>Motor Controller, State Observer, and MPC</h1>
+                <div>
+                    <a href="https://wontothree.github.io/techblog_/tmp/motor-controller-and-state-observer/" target="_blank" style="text-decoration:none; color:inherit;">
+                        Motor Controller and State Observer
+                    </a>
+                    <br>
+                    <a href="https://wontothree.github.io/techblog_/tmp/nmpc/" target="_blank" style="text-decoration:none; color:inherit;">
+                        Non-Linear Model Predictive Control
+                    </a>
+                </div>
+            </div>
+        </section>
 
-            <h2>Poster</h2>
-            <img src="imgs/eceif-poster.png" alt="Cart Pole" style="display:block; margin:auto; width:90%; height:auto;">
-        </div>
-    </div>
+        <!-- Reference -->
+        <section style="width: 100%; margin-bottom: 40px;">
+            <h1 style="font-size: 1.87rem;">⛰️ Reference</h1>
+            <div class="box">
+                Nonlinear Model Predictive Control of an Inverted Pendulum
+            </div>
+        </section>
+
+        <!-- Photos -->
+        <section style="width: 100%; margin-bottom: 40px;">
+            <h1 style="font-size: 1.87rem;">📷 Photos</h1>
+            <div class="box">
+                <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+                    <img src="imgs/prize.png" alt="prize" style="width: 40%; height: auto; border-radius: 8px;">
+                </div>
+            </div>
+        </section>
+
+        <!-- Feeling to Project -->
+        <section style="width: 100%; margin-bottom: 40px;">
+            <h1 style="font-size: 1.87rem;">✨ Feeling to Project</h1>
+            <div class="box">
+                <ol>
+                    <li>프로젝트를 진행하면 나는 항상 소프트웨어 파트를 맡았다. 프로젝트를 많이 할지라도 하드웨어에 댛한 지식은 진전을 이루지 못했다. 이번 기회를 통해 하드웨어에 대한 두려움을 극복ㅎ하고 전문성을 갖추고 싶었다.</li>
+                    <li>많은 프로젝트를 하더라도 분업을 하기 때문에 프로젝트의 큰 방향성을 이해함과 동시에 세부적인 것까지 몯 파악하기란 어려웠다. A부터 Z까지 내가 주도하는 ㅍ프로젝트에 대한 갈등이 있었다.</li>
+                    <li>이론으로만 알고 있는 MPC controller와 RL controller를 직접 구현하고 적용해보고 싶었다.</li>
+                    <li>4등을 해서 인기상을 수상했다. 교수들의 평가에 의해 결정되는 1~3등과 달리, 인기상은 학생들의 투표에 의해 결정되었다. 교수들의 평가 기준에는 들지 못했던 것 같다. 두 가지 부분에서 부족했던 것이라 예상한다. 첫 번째는 전전컴에서 다루는 범위를 벗어난 것들을 포함하고 있었다. 두 번째는 학부 수준을 벗어나는 내용들이 많았다. 나름 나의 결과와 발표가 준수했음에도 이 부분에서 다른 팀에게 밀렸던 것이라 생각한다. 친구들은 객관적으로 가장 우수했으며 많은 사람들이 관심을 가졌다고 했다. 개인적으로 1등을 하지 못한 것이 억울했다.</li>
+                    <li>하지만 내 부스가 가장 많은 사람들이 몰렸을 만큼 많은 사람들이 방문해주었다. 친구가 말하길 나를 중심으로 모든 사라ㅏㅁ들이 몰려들었다고 한다. 이런 대회에서 중요한 요소 중 하나가 시각적으로 자극적인 걸 하는 것이다. 적당히 이 정도는 되겠지라고 생각하는 것 이상으로 자극적일수록 좋다.</li>
+                    <li>시연하는 과정에서 세게 치는 사람이 많았다. 나는 굉장히 긴 길이의 막대를 사용했기 때문에 살짝만 쳐도 막대의 중심축에는 큰 관성력이 작용하게 되어 넘어질 수밖에 없다. plz don’t touch.</li>
+                    <li>첫 포스터 발표였다. 다른 내용은 다소 부족했을지라도 “PID is all you need” 제목 하나는 너무 마음에 든다.</li>
+                </ol>
+            </div>
+        </section>
+    </div> <!-- base -->
 
     <br><br>
 
